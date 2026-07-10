@@ -6,4 +6,6 @@ _site/
 .env
 .secrets/
 .wrangler/
+app/build/
+app/Krehin.xcodeproj/xcuserdata/
 .DS_Store

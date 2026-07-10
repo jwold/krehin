@@ -1,0 +1,56 @@
+name: Krehin
+options:
+  bundleIdPrefix: com.joshuawold
+  deploymentTarget:
+    macOS: "15.0"
+    iOS: "18.0"
+  generateEmptyDirectories: true
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    CURRENT_PROJECT_VERSION: 1
+    MARKETING_VERSION: 0.1.0
+    CODE_SIGN_STYLE: Automatic
+targets:
+  Krehin:
+    type: application
+    platform: macOS
+    sources:
+      - Sources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.joshuawold.krehin
+        PRODUCT_NAME: Krehin
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Krehin
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
+        ENABLE_HARDENED_RUNTIME: YES
+  Krehin-iOS:
+    type: application
+    platform: iOS
+    sources:
+      - Sources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.joshuawold.krehin.ios
+        PRODUCT_NAME: Krehin
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Krehin
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
+        TARGETED_DEVICE_FAMILY: "1,2"
+schemes:
+  Krehin:
+    build:
+      targets:
+        Krehin: all
+    run:
+      config: Debug
+  Krehin-iOS:
+    build:
+      targets:
+        Krehin-iOS: all
+    run:
+      config: Debug

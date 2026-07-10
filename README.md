@@ -53,3 +53,10 @@ Then run `npm run worker:dev`. Generate binding types after changing
 
 Production secrets are installed with `wrangler secret put`; they are never
 committed. See [docs/publishing.md](docs/publishing.md) for Drafts and iA Writer.
+
+## Native app
+
+The `app` directory contains a shared SwiftUI project with native macOS and iOS
+targets. Open `app/Krehin.xcodeproj`, then run the `Krehin` scheme on Mac or the
+`Krehin-iOS` scheme in Simulator. The current prototype persists local drafts
+and published status with SwiftData; Micropub synchronization is the next layer.
