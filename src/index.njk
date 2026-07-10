@@ -1,0 +1,28 @@
+---
+layout: layouts/base.njk
+description: Short notes by Joshua Wold.
+---
+<section class="timeline" aria-label="Posts">
+{% for group in collections.postDays %}
+    {% if not loop.first %}<hr class="day-break" aria-hidden="true">{% endif %}
+    {% for post in group.posts %}
+    <article class="post">
+        {% if post.data.title %}
+        <header class="post-header">
+            <h2 class="post-title">
+                {% if post.data.external_url %}
+                <a href="{{ post.data.external_url }}" rel="external">{{ post.data.title }} <span class="external-mark" aria-hidden="true">↗</span></a><a class="permalink-mark" href="{{ post.url }}" aria-label="Permalink for {{ post.data.title }}">★</a>
+                {% else %}
+                <a href="{{ post.url }}">{{ post.data.title }}</a>
+                {% endif %}
+            </h2>
+        </header>
+        {% endif %}
+        {% if post.content %}<div class="post-content">{{ post.content | safe }}</div>{% endif %}
+        {% if not post.data.title %}<a class="note-permalink" href="{{ post.url }}" aria-label="Permalink">★</a>{% endif %}
+    </article>
+    {% endfor %}
+{% else %}
+    <p class="empty-state">Nothing here yet.</p>
+{% endfor %}
+</section>

@@ -1,0 +1,9 @@
+node_modules/
+dist/
+ghost-local/
+_site/
+.dev.vars
+.env
+.secrets/
+.wrangler/
+.DS_Store

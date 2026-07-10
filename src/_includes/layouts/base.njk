@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="{{ site.language }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#111110">
+    <meta name="description" content="{{ description or site.description }}">
+    <title>{% if title %}{{ title }} - {% endif %}{{ site.name }}</title>
+    <link rel="canonical" href="{{ page.url | absoluteSiteUrl(site.url) }}">
+    <link rel="micropub" href="{{ site.micropub }}">
+    <link rel="alternate" type="application/atom+xml" title="{{ site.name }}" href="/feed.xml">
+    <link rel="stylesheet" href="/assets/screen.css">
+</head>
+<body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header">
+        <div class="site-shell">
+            <a class="site-name" href="/" aria-label="{{ site.name }}, home">{{ site.name }}</a>
+        </div>
+    </header>
+    <main class="site-shell" id="content">
+        {{ content | safe }}
+    </main>
+    <div class="share-status" role="status" aria-live="polite"></div>
+    <script src="/assets/screen.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "name": "krehin-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A Markdown-first short-form publication with Micropub publishing.",
+  "scripts": {
+    "dev": "PATH_PREFIX=/ eleventy --serve --port=8000",
+    "build": "eleventy",
+    "check": "npm run worker:types:check && tsc --noEmit && npm test && npm run build",
+    "test": "vitest run",
+    "worker:dev": "wrangler dev",
+    "worker:types": "wrangler types worker-configuration.d.ts",
+    "worker:types:check": "wrangler types worker-configuration.d.ts --check",
+    "worker:deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "latest",
+    "@11ty/eleventy-plugin-rss": "latest",
+    "@types/node": "latest",
+    "typescript": "latest",
+    "vitest": "latest",
+    "wrangler": "latest"
+  }
+}

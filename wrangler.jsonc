@@ -1,0 +1,22 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "krehin-publisher",
+  "main": "worker/src/index.ts",
+  "compatibility_date": "2026-07-10",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "vars": {
+    "GITHUB_OWNER": "jwold",
+    "GITHUB_REPO": "krehin",
+    "GITHUB_BRANCH": "main",
+    "POSTS_DIRECTORY": "src/posts",
+    "SITE_URL": "https://jwold.github.io/krehin"
+  },
+  "secrets": {
+    "required": ["GITHUB_TOKEN", "MICROPUB_TOKEN"]
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  }
+}

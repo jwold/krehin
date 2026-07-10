@@ -1,0 +1,17 @@
+---
+layout: layouts/base.njk
+---
+<article class="post post--single">
+    {% if title %}
+    <header class="post-header">
+        <h1 class="post-title">
+            {% if external_url %}<a href="{{ external_url }}" rel="external">{{ title }} <span class="external-mark" aria-hidden="true">↗</span></a>{% else %}{{ title }}{% endif %}
+        </h1>
+    </header>
+    {% endif %}
+    {% if content %}<div class="post-content">{{ content | safe }}</div>{% endif %}
+    <footer class="post-meta">
+        <time datetime="{{ date | isoDate }}">{{ date | readableDate }}</time>
+        <button class="share-button" type="button" data-share-url="{{ page.url | absoluteSiteUrl(site.url) }}" data-share-title="{{ title or site.name }}">Share</button>
+    </footer>
+</article>
