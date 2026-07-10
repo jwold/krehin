@@ -58,5 +58,5 @@ committed. See [docs/publishing.md](docs/publishing.md) for Drafts and iA Writer
 
 The `app` directory contains a shared SwiftUI project with native macOS and iOS
 targets. Open `app/Krehin.xcodeproj`, then run the `Krehin` scheme on Mac or the
-`Krehin-iOS` scheme in Simulator. The current prototype persists local drafts
-and published status with SwiftData; Micropub synchronization is the next layer.
+`Krehin-iOS` scheme in Simulator. Drafts persist with SwiftData, publishing uses
+the private Micropub endpoint, and the access token is stored in Apple Keychain.

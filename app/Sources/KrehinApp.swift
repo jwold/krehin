@@ -3,6 +3,7 @@ import SwiftUI
 
 @main
 struct KrehinApp: App {
+    @State private var publisher = PublisherConfiguration()
     private let container: ModelContainer = {
         let configuration = ModelConfiguration("Krehin")
         return try! ModelContainer(for: PostRecord.self, configurations: configuration)
@@ -11,6 +12,7 @@ struct KrehinApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(publisher)
         }
         .modelContainer(container)
         #if os(macOS)

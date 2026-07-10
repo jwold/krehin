@@ -32,6 +32,7 @@ struct ContentView: View {
     @State private var filter: PostFilter? = .all
     @State private var selection: PersistentIdentifier?
     @State private var searchText = ""
+    @State private var showingPublisherSettings = false
 
     private var visiblePosts: [PostRecord] {
         posts.filter { post in
@@ -54,7 +55,11 @@ struct ContentView: View {
 
     var body: some View {
         NavigationSplitView {
-            SidebarView(filter: $filter, posts: posts)
+            SidebarView(
+                filter: $filter,
+                posts: posts,
+                showPublisherSettings: { showingPublisherSettings = true }
+            )
                 .navigationSplitViewColumnWidth(min: 180, ideal: 210, max: 260)
         } content: {
             PostListView(
@@ -85,6 +90,9 @@ struct ContentView: View {
         }
         .onChange(of: filter) {
             selectFirstVisiblePostIfNeeded()
+        }
+        .sheet(isPresented: $showingPublisherSettings) {
+            PublisherSettingsView()
         }
     }
 

@@ -3,6 +3,7 @@ import SwiftUI
 struct SidebarView: View {
     @Binding var filter: PostFilter?
     let posts: [PostRecord]
+    let showPublisherSettings: () -> Void
 
     var body: some View {
         List(selection: $filter) {
@@ -26,6 +27,14 @@ struct SidebarView: View {
             .foregroundStyle(.secondary)
         }
         .navigationTitle("Krehin")
+        .safeAreaInset(edge: .bottom) {
+            Button("Publishing Settings", systemImage: "gearshape", action: showPublisherSettings)
+                .buttonStyle(.plain)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+        }
     }
 
     private func count(for filter: PostFilter) -> Int {

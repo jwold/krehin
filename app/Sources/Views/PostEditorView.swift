@@ -3,8 +3,13 @@ import SwiftUI
 
 struct PostEditorView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(PublisherConfiguration.self) private var publisherConfiguration
     @Bindable var post: PostRecord
     @FocusState private var focusedField: Field?
+    @State private var isPublishing = false
+    @State private var showingPublisherSettings = false
+    @State private var showingPublishError = false
+    @State private var publishError = ""
 
     private enum Field {
         case title
@@ -50,14 +55,26 @@ struct PostEditorView: View {
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 if post.status == .published {
-                    Button("Share", systemImage: "square.and.arrow.up") {
-                        // Sharing the public permalink will be enabled with Micropub sync.
+                    if let permalink = URL(string: post.remoteURL), !post.remoteURL.isEmpty {
+                        ShareLink(item: permalink) {
+                            Label("Share", systemImage: "square.and.arrow.up")
+                        }
+                    } else {
+                        Label("Published", systemImage: "checkmark.circle.fill")
+                            .foregroundStyle(.secondary)
                     }
-                    .disabled(true)
                 } else {
-                    Button("Publish", systemImage: "paperplane.fill", action: publish)
+                    Button(action: startPublishing) {
+                        if isPublishing {
+                            ProgressView()
+                                .controlSize(.small)
+                        } else {
+                            Label("Publish", systemImage: "paperplane.fill")
+                        }
+                    }
                         .buttonStyle(.borderedProminent)
                         .keyboardShortcut(.return, modifiers: .command)
+                        .disabled(isPublishing || (post.title.isEmpty && post.body.isEmpty))
                 }
             }
         }
@@ -66,6 +83,14 @@ struct PostEditorView: View {
                 focusedField = .body
             }
         }
+        .sheet(isPresented: $showingPublisherSettings) {
+            PublisherSettingsView()
+        }
+        .alert("Couldn’t Publish", isPresented: $showingPublishError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(publishError)
+        }
     }
 
     private func saveChanges() {
@@ -73,10 +98,34 @@ struct PostEditorView: View {
         try? modelContext.save()
     }
 
-    private func publish() {
-        post.status = .published
-        post.publishedAt = .now
-        post.modifiedAt = .now
-        try? modelContext.save()
+    private func startPublishing() {
+        guard publisherConfiguration.hasToken else {
+            showingPublisherSettings = true
+            return
+        }
+        Task { await publish() }
+    }
+
+    @MainActor
+    private func publish() async {
+        isPublishing = true
+        defer { isPublishing = false }
+
+        do {
+            let permalink = try await MicropubClient().publish(
+                title: post.title,
+                content: post.body,
+                endpoint: publisherConfiguration.endpoint,
+                token: publisherConfiguration.token()
+            )
+            post.status = .published
+            post.publishedAt = .now
+            post.modifiedAt = .now
+            post.remoteURL = permalink.absoluteString
+            try modelContext.save()
+        } catch {
+            publishError = error.localizedDescription
+            showingPublishError = true
+        }
     }
 }

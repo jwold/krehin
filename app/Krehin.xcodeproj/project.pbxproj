@@ -7,27 +7,39 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		06ECEC0E5D53AF4DA723CA80 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 876CE87122B3F4DAB2F17D9E /* KeychainStore.swift */; };
 		13329D24C51E8FDAFDAEDE37 /* KrehinApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85382A5F89B84FF3F0B3D5BB /* KrehinApp.swift */; };
 		2845AAEC51F703C73B7AE32D /* PostRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40F5363D761EE4B96EEA7AD3 /* PostRecord.swift */; };
+		2D78A119E7CC5DE29131865F /* PublisherSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F012A4FEB6C92C36A4BF22A /* PublisherSettingsView.swift */; };
 		30BB6105F86A417B3AB40298 /* PostEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C94EAAFC1B101EDA7E5915C1 /* PostEditorView.swift */; };
 		34E77859812C342DD277113F /* PostListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76D1A73591A459EFB5A6EB77 /* PostListView.swift */; };
+		360410FD7072E19A1ED62E7A /* MicropubClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23139B30977FE09EE54445C4 /* MicropubClient.swift */; };
 		4532C30E5DD00A8543FAF16F /* PostEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C94EAAFC1B101EDA7E5915C1 /* PostEditorView.swift */; };
+		4820D3C9B829EC61392F950A /* MicropubClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23139B30977FE09EE54445C4 /* MicropubClient.swift */; };
 		4AC3CE9D3D4328650B719B65 /* PostListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76D1A73591A459EFB5A6EB77 /* PostListView.swift */; };
 		51382A988297DFC772582349 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE8215E34914921C23958280 /* SidebarView.swift */; };
+		72E3B5DC957CBBD24BA1D4FB /* PublisherConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = D159CFF28F5316A516040459 /* PublisherConfiguration.swift */; };
+		89DB0FD38E026BB2D765C7BA /* PublisherSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F012A4FEB6C92C36A4BF22A /* PublisherSettingsView.swift */; };
 		984B8B2ADCBF52CDB09E5DDD /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE8215E34914921C23958280 /* SidebarView.swift */; };
 		A240BEB604806B806CACC4A5 /* KrehinApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85382A5F89B84FF3F0B3D5BB /* KrehinApp.swift */; };
 		CA136389D71F3D1F951F5473 /* PostRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40F5363D761EE4B96EEA7AD3 /* PostRecord.swift */; };
 		CA4A2124E9A4BDB88F702102 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 039FBFC7B05C8DD0CCC25D64 /* ContentView.swift */; };
 		E410452CF1C1D638D31E0A28 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 039FBFC7B05C8DD0CCC25D64 /* ContentView.swift */; };
+		EE1E25418B10938E8176E924 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 876CE87122B3F4DAB2F17D9E /* KeychainStore.swift */; };
+		FD77BABA58C20D8C2F904D6B /* PublisherConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = D159CFF28F5316A516040459 /* PublisherConfiguration.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		039FBFC7B05C8DD0CCC25D64 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		23139B30977FE09EE54445C4 /* MicropubClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicropubClient.swift; sourceTree = "<group>"; };
 		40F5363D761EE4B96EEA7AD3 /* PostRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostRecord.swift; sourceTree = "<group>"; };
+		6F012A4FEB6C92C36A4BF22A /* PublisherSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublisherSettingsView.swift; sourceTree = "<group>"; };
 		76D1A73591A459EFB5A6EB77 /* PostListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostListView.swift; sourceTree = "<group>"; };
 		85382A5F89B84FF3F0B3D5BB /* KrehinApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KrehinApp.swift; sourceTree = "<group>"; };
+		876CE87122B3F4DAB2F17D9E /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
 		A9309D5D847BE5E02A2EA51A /* Krehin.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Krehin.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C94EAAFC1B101EDA7E5915C1 /* PostEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostEditorView.swift; sourceTree = "<group>"; };
+		D159CFF28F5316A516040459 /* PublisherConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublisherConfiguration.swift; sourceTree = "<group>"; };
 		F04AEC68F433EC6438702DA1 /* Krehin-iOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "Krehin-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE8215E34914921C23958280 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -46,9 +58,20 @@
 			children = (
 				85382A5F89B84FF3F0B3D5BB /* KrehinApp.swift */,
 				C9CE532EF46D24ADB1A2FAD2 /* Models */,
+				59708EE1C70FC75C0C8CC65F /* Services */,
 				B927AC2F5900102A15644D4E /* Views */,
 			);
 			path = Sources;
+			sourceTree = "<group>";
+		};
+		59708EE1C70FC75C0C8CC65F /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				876CE87122B3F4DAB2F17D9E /* KeychainStore.swift */,
+				23139B30977FE09EE54445C4 /* MicropubClient.swift */,
+				D159CFF28F5316A516040459 /* PublisherConfiguration.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 		B927AC2F5900102A15644D4E /* Views */ = {
@@ -57,6 +80,7 @@
 				039FBFC7B05C8DD0CCC25D64 /* ContentView.swift */,
 				C94EAAFC1B101EDA7E5915C1 /* PostEditorView.swift */,
 				76D1A73591A459EFB5A6EB77 /* PostListView.swift */,
+				6F012A4FEB6C92C36A4BF22A /* PublisherSettingsView.swift */,
 				FE8215E34914921C23958280 /* SidebarView.swift */,
 			);
 			path = Views;
@@ -159,10 +183,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				E410452CF1C1D638D31E0A28 /* ContentView.swift in Sources */,
+				06ECEC0E5D53AF4DA723CA80 /* KeychainStore.swift in Sources */,
 				13329D24C51E8FDAFDAEDE37 /* KrehinApp.swift in Sources */,
+				4820D3C9B829EC61392F950A /* MicropubClient.swift in Sources */,
 				4532C30E5DD00A8543FAF16F /* PostEditorView.swift in Sources */,
 				34E77859812C342DD277113F /* PostListView.swift in Sources */,
 				2845AAEC51F703C73B7AE32D /* PostRecord.swift in Sources */,
+				FD77BABA58C20D8C2F904D6B /* PublisherConfiguration.swift in Sources */,
+				89DB0FD38E026BB2D765C7BA /* PublisherSettingsView.swift in Sources */,
 				51382A988297DFC772582349 /* SidebarView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -172,10 +200,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				CA4A2124E9A4BDB88F702102 /* ContentView.swift in Sources */,
+				EE1E25418B10938E8176E924 /* KeychainStore.swift in Sources */,
 				A240BEB604806B806CACC4A5 /* KrehinApp.swift in Sources */,
+				360410FD7072E19A1ED62E7A /* MicropubClient.swift in Sources */,
 				30BB6105F86A417B3AB40298 /* PostEditorView.swift in Sources */,
 				4AC3CE9D3D4328650B719B65 /* PostListView.swift in Sources */,
 				CA136389D71F3D1F951F5473 /* PostRecord.swift in Sources */,
+				72E3B5DC957CBBD24BA1D4FB /* PublisherConfiguration.swift in Sources */,
+				2D78A119E7CC5DE29131865F /* PublisherSettingsView.swift in Sources */,
 				984B8B2ADCBF52CDB09E5DDD /* SidebarView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
