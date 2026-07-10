@@ -43,7 +43,7 @@ the token; visiting the website never exposes it.
 Standard URL-encoded Micropub requests work as well:
 
 ```sh
-curl -i https://krehin-publisher.workers.dev/micropub \
+curl -i https://krehin-publisher.joshua-wold.workers.dev/micropub \
   -H "Authorization: Bearer $MICROPUB_TOKEN" \
   -H "Content-Type: application/x-www-form-urlencoded" \
   --data-urlencode "h=entry" \
