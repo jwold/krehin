@@ -9,14 +9,14 @@ eleventyExcludeFromCollections: true
   <link href="{{ '/feed.xml' | absoluteSiteUrl(site.url) }}" rel="self" />
   <link href="{{ '/' | absoluteSiteUrl(site.url) }}" />
   <id>{{ site.url }}/</id>
-  <updated>{{ collections.posts | latestDate }}</updated>
-{% for post in collections.posts | reverse %}
+  <updated>{{ collections.publishedPosts | latestDate }}</updated>
+{% for post in collections.publishedPosts | reverse %}
   <entry>
     <title>{{ post.data.title or "Note" }}</title>
     <link href="{{ post.url | absoluteSiteUrl(site.url) }}" />
     <id>{{ post.url | absoluteSiteUrl(site.url) }}</id>
     <updated>{{ post.date | isoDate }}</updated>
-    <content type="html"><![CDATA[{{ post.content | safe }}]]></content>
+    <content type="html"><![CDATA[{{ post.content | htmlToAbsoluteUrls(post.url | absoluteSiteUrl(site.url)) | safe }}]]></content>
   </entry>
 {% endfor %}
 </feed>

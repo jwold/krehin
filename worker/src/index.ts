@@ -45,6 +45,7 @@ function errorResponse(error: RequestError): Response {
 function isAuthorized(request: Request, expectedToken: string): boolean {
     const header = request.headers.get("authorization") || "";
     const provided = header.startsWith("Bearer ") ? header.slice(7) : "";
+    if (!expectedToken || !provided) return false;
     const expectedHash = createHash("sha256").update(expectedToken).digest();
     const providedHash = createHash("sha256").update(provided).digest();
     return timingSafeEqual(expectedHash, providedHash);
@@ -188,7 +189,8 @@ function randomSuffix(): string {
 function postSlug(post: PostInput): string {
     const date = post.published.slice(0, 10);
     const source = post.requestedSlug || post.title || post.content.slice(0, 100);
-    return `${date}-${slugify(source)}-${randomSuffix()}`;
+    const base = `${date}-${slugify(source)}`;
+    return post.requestedSlug ? base : `${base}-${randomSuffix()}`;
 }
 
 function markdownFor(post: PostInput, slug: string): string {
@@ -239,14 +241,17 @@ function githubHeaders(env: Env): Record<string, string> {
     };
 }
 
-async function githubFile(slug: string, env: Env, fetcher: Fetcher): Promise<GitHubFile> {
+async function githubFile(slug: string, env: Env, fetcher: Fetcher, logNotFound = true): Promise<GitHubFile> {
     const response = await fetcher(`${githubEndpoint(slug, env)}?ref=${encodeURIComponent(env.GITHUB_BRANCH)}`, {
         headers: githubHeaders(env)
     });
     if (!response.ok) {
         const detail = (await response.text()).slice(0, 500);
+        if (response.status === 404) {
+            if (logNotFound) console.error(JSON.stringify({event: "github_read_failed", status: response.status, detail}));
+            throw new RequestError(404, "not_found", "The published post was not found.");
+        }
         console.error(JSON.stringify({event: "github_read_failed", status: response.status, detail}));
-        if (response.status === 404) throw new RequestError(404, "not_found", "The published post was not found.");
         throw new RequestError(502, "temporarily_unavailable", "GitHub could not read the post.");
     }
     const file = await response.json<GitHubFile>();
@@ -276,7 +281,18 @@ async function putPost(markdown: string, slug: string, message: string, env: Env
 }
 
 async function commitPost(post: PostInput, slug: string, env: Env, fetcher: Fetcher): Promise<void> {
-    await putPost(markdownFor(post, slug), slug, `Publish ${slug}`, env, fetcher);
+    const markdown = markdownFor(post, slug);
+    if (post.requestedSlug) {
+        try {
+            const file = await githubFile(slug, env, fetcher, false);
+            const existing = Buffer.from(file.content.replace(/\s/g, ""), "base64").toString("utf8");
+            if (existing === markdown) return;
+            throw new RequestError(409, "conflict", "That publication identifier is already in use by different content.");
+        } catch (error) {
+            if (!(error instanceof RequestError) || error.status !== 404) throw error;
+        }
+    }
+    await putPost(markdown, slug, `Publish ${slug}`, env, fetcher);
 }
 
 function slugFromPermalink(value: string, env: Env): string {
@@ -329,7 +345,13 @@ async function updatePost(form: URLSearchParams, env: Env, fetcher: Fetcher): Pr
 
 async function deletePost(form: URLSearchParams, env: Env, fetcher: Fetcher): Promise<string> {
     const slug = slugFromPermalink(form.get("url") || "", env);
-    const file = await githubFile(slug, env, fetcher);
+    let file: GitHubFile;
+    try {
+        file = await githubFile(slug, env, fetcher, false);
+    } catch (error) {
+        if (error instanceof RequestError && error.status === 404) return slug;
+        throw error;
+    }
     const response = await fetcher(githubEndpoint(slug, env), {
         method: "DELETE",
         headers: githubHeaders(env),

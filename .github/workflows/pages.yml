@@ -27,8 +27,8 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Build site
-        run: npm run build
+      - name: Check and build site
+        run: npm run check
         env:
           PATH_PREFIX: /
           SITE_URL: https://krehin.com

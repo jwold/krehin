@@ -14,6 +14,12 @@ function localDay(date) {
     return `${values.year}-${values.month}-${values.day}`;
 }
 
+function publishedPostsFrom(posts) {
+    return posts
+        .filter((post) => !post.data.draft)
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+}
+
 module.exports = function (eleventyConfig) {
     eleventyConfig.addPlugin(EleventyHtmlBasePlugin);
     eleventyConfig.addPlugin(pluginRss);
@@ -37,10 +43,12 @@ module.exports = function (eleventyConfig) {
     });
     eleventyConfig.addFilter("json", (value) => JSON.stringify(value));
 
+    const publishedPosts = (collectionApi) => publishedPostsFrom(collectionApi.getFilteredByTag("posts"));
+
+    eleventyConfig.addCollection("publishedPosts", publishedPosts);
+
     eleventyConfig.addCollection("postDays", (collectionApi) => {
-        const posts = collectionApi.getFilteredByTag("posts")
-            .filter((post) => !post.data.draft)
-            .sort((a, b) => new Date(b.date) - new Date(a.date));
+        const posts = publishedPosts(collectionApi).toReversed();
         const groups = [];
 
         for (const post of posts) {
@@ -68,3 +76,5 @@ module.exports = function (eleventyConfig) {
         htmlTemplateEngine: "njk"
     };
 };
+
+module.exports.publishedPostsFrom = publishedPostsFrom;

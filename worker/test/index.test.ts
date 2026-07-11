@@ -18,6 +18,15 @@ describe("Krehin publisher", () => {
         expect(response.status).toBe(401);
     });
 
+    it("rejects requests when the configured publishing token is empty", async () => {
+        const request = new Request("https://publisher.example/micropub", {
+            method: "POST",
+            headers: {authorization: "Bearer anything"}
+        });
+        const response = await handleRequest(request, {...env, MICROPUB_TOKEN: ""});
+        expect(response.status).toBe(401);
+    });
+
     it("commits a form post as Markdown and returns its permalink", async () => {
         const fetcher = vi.fn<typeof fetch>(async () => Response.json({content: {sha: "abc"}}, {status: 201}));
         const request = new Request("https://publisher.example/micropub", {
@@ -54,6 +63,82 @@ describe("Krehin publisher", () => {
         }));
         expect(post.content).toBe("Hello");
         expect(post.categories).toEqual(["notes", "web"]);
+    });
+
+    it("reuses a stable publication when an identical create request is retried", async () => {
+        const body = new URLSearchParams({
+            h: "entry",
+            content: "Retry-safe body",
+            published: "2026-07-10T16:00:00.000Z",
+            "mp-slug": "stable-publication-id"
+        });
+        const slug = "2026-07-10-stable-publication-id";
+        const markdown = testing.markdownFor(testing.fromForm(body.toString()), slug);
+        const fetcher = vi.fn<typeof fetch>().mockResolvedValueOnce(Response.json({
+            sha: "existing-sha",
+            encoding: "base64",
+            content: Buffer.from(markdown).toString("base64")
+        }));
+        const request = new Request("https://publisher.example/micropub", {
+            method: "POST",
+            headers: {
+                authorization: "Bearer micropub-secret",
+                "content-type": "application/x-www-form-urlencoded"
+            },
+            body
+        });
+
+        const response = await handleRequest(request, env, fetcher);
+        expect(response.status).toBe(201);
+        expect(response.headers.get("location")).toBe(`https://krehin.com/${slug}/`);
+        expect(fetcher).toHaveBeenCalledTimes(1);
+    });
+
+    it("creates a stable publication when its identifier is unused", async () => {
+        const fetcher = vi.fn<typeof fetch>()
+            .mockResolvedValueOnce(Response.json({message: "Not Found"}, {status: 404}))
+            .mockResolvedValueOnce(Response.json({content: {sha: "new-sha"}}, {status: 201}));
+        const request = new Request("https://publisher.example/micropub", {
+            method: "POST",
+            headers: {
+                authorization: "Bearer micropub-secret",
+                "content-type": "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams({
+                content: "Stable body",
+                published: "2026-07-10T16:00:00.000Z",
+                "mp-slug": "stable-publication-id"
+            })
+        });
+
+        const response = await handleRequest(request, env, fetcher);
+        expect(response.status).toBe(201);
+        expect(response.headers.get("location")).toBe("https://krehin.com/2026-07-10-stable-publication-id/");
+        expect(fetcher).toHaveBeenCalledTimes(2);
+        expect(fetcher.mock.calls[1][1]?.method).toBe("PUT");
+    });
+
+    it("rejects reuse of a stable publication identifier for different content", async () => {
+        const fetcher = vi.fn<typeof fetch>().mockResolvedValueOnce(Response.json({
+            sha: "existing-sha",
+            encoding: "base64",
+            content: Buffer.from("different").toString("base64")
+        }));
+        const request = new Request("https://publisher.example/micropub", {
+            method: "POST",
+            headers: {
+                authorization: "Bearer micropub-secret",
+                "content-type": "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams({
+                content: "New body",
+                published: "2026-07-10T16:00:00.000Z",
+                "mp-slug": "stable-publication-id"
+            })
+        });
+
+        const response = await handleRequest(request, env, fetcher);
+        expect(response.status).toBe(409);
     });
 
     it("updates the Markdown behind an existing permalink", async () => {
@@ -120,6 +205,22 @@ describe("Krehin publisher", () => {
         expect(response.status).toBe(204);
         expect(fetcher.mock.calls[1][1]?.method).toBe("DELETE");
         expect(JSON.parse(String(fetcher.mock.calls[1][1]?.body)).sha).toBe("existing-sha");
+    });
+
+    it("treats deletion of an already missing post as successful", async () => {
+        const fetcher = vi.fn<typeof fetch>().mockResolvedValueOnce(Response.json({message: "Not Found"}, {status: 404}));
+        const request = new Request("https://publisher.example/micropub", {
+            method: "POST",
+            headers: {
+                authorization: "Bearer micropub-secret",
+                "content-type": "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams({action: "delete", url: "https://krehin.com/already-gone/"})
+        });
+
+        const response = await handleRequest(request, env, fetcher);
+        expect(response.status).toBe(204);
+        expect(fetcher).toHaveBeenCalledTimes(1);
     });
 
     it("rejects mutations outside the Krehin site", () => {

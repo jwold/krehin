@@ -5,7 +5,8 @@
   "description": "A Markdown-first short-form publication with Micropub publishing.",
   "scripts": {
     "dev": "PATH_PREFIX=/ eleventy --serve --port=8000",
-    "build": "eleventy",
+    "clean": "rm -rf _site",
+    "build": "npm run clean && eleventy",
     "check": "npm run worker:types:check && tsc --noEmit && npm test && npm run build",
     "test": "vitest run",
     "worker:dev": "wrangler dev",
