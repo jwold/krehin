@@ -6,6 +6,17 @@
         <description>Updates for the Krehin macOS app.</description>
         <language>en</language>
         <item>
+            <title>0.1.1</title>
+            <pubDate>Fri, 10 Jul 2026 20:26:14 -0700</pubDate>
+            <link>https://krehin.com/</link>
+            <sparkle:version>2</sparkle:version>
+            <sparkle:shortVersionString>0.1.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description sparkle:format="markdown"><![CDATA[Validates automatic updates from the new private app repository.
+]]></description>
+            <enclosure url="https://github.com/jwold/krehin/releases/download/v0.1.1/Krehin-0.1.1.zip" length="2947850" type="application/octet-stream" sparkle:edSignature="uGreYvXz7OVKJXwSjNL1c5E0hMgwpGQY1SXuJXD+uwkwNKbMp8DbFfIhaLsQudtZFKIte+h22kne7TzmA/owAw=="/>
+        </item>
+        <item>
             <title>0.1.0</title>
             <pubDate>Fri, 10 Jul 2026 20:23:06 -0700</pubDate>
             <link>https://krehin.com/</link>
