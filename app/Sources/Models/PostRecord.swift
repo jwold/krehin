@@ -42,10 +42,11 @@ final class PostRecord {
         set { statusRawValue = newValue.rawValue }
     }
 
-    var displayTitle: String {
-        let cleanTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !cleanTitle.isEmpty { return cleanTitle }
-
+    func displayTitle(showPostTitles: Bool) -> String {
+        if showPostTitles {
+            let cleanTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !cleanTitle.isEmpty { return cleanTitle }
+        }
         let firstLine = body
             .split(whereSeparator: \Character.isNewline)
             .first?

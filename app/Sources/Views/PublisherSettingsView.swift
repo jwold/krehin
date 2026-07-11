@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct PublisherSettingsView: View {
+struct AppSettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(PublisherConfiguration.self) private var configuration
 
@@ -8,10 +8,15 @@ struct PublisherSettingsView: View {
     @State private var token = ""
     @State private var errorMessage = ""
     @State private var showingError = false
+    @AppStorage("show-post-titles") private var showPostTitles = false
 
     var body: some View {
         NavigationStack {
             Form {
+                Section("Editor") {
+                    Toggle("Show post titles", isOn: $showPostTitles)
+                }
+
                 Section("Micropub") {
                     TextField("Endpoint", text: $endpoint)
                         #if os(iOS)
@@ -30,7 +35,7 @@ struct PublisherSettingsView: View {
                 }
             }
             .formStyle(.grouped)
-            .navigationTitle("Publishing")
+            .navigationTitle("Settings")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }

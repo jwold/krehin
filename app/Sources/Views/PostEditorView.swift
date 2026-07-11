@@ -10,6 +10,7 @@ struct PostEditorView: View {
     @State private var showingPublisherSettings = false
     @State private var showingPublishError = false
     @State private var publishError = ""
+    @AppStorage("show-post-titles") private var showPostTitles = false
 
     private enum Field {
         case title
@@ -35,13 +36,15 @@ struct PostEditorView: View {
             Divider()
 
             VStack(alignment: .leading, spacing: 14) {
-                TextField("Optional title", text: $post.title, axis: .vertical)
-                    .textFieldStyle(.plain)
-                    .font(.system(size: 25, weight: .semibold))
-                    .focused($focusedField, equals: .title)
-                    .onChange(of: post.title) { saveChanges() }
+                if showPostTitles {
+                    TextField("Optional title", text: $post.title, axis: .vertical)
+                        .textFieldStyle(.plain)
+                        .font(.system(size: 25, weight: .semibold))
+                        .focused($focusedField, equals: .title)
+                        .onChange(of: post.title) { saveChanges() }
 
-                Divider()
+                    Divider()
+                }
 
                 TextEditor(text: $post.body)
                     .font(.body)
@@ -51,7 +54,7 @@ struct PostEditorView: View {
             }
             .padding(22)
         }
-        .navigationTitle(post.displayTitle)
+        .navigationTitle(post.displayTitle(showPostTitles: showPostTitles))
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 if post.status == .published {
@@ -74,7 +77,7 @@ struct PostEditorView: View {
                     }
                         .buttonStyle(.borderedProminent)
                         .keyboardShortcut(.return, modifiers: .command)
-                        .disabled(isPublishing || (post.title.isEmpty && post.body.isEmpty))
+                        .disabled(isPublishing || (post.body.isEmpty && (!showPostTitles || post.title.isEmpty)))
                 }
             }
         }
@@ -84,7 +87,7 @@ struct PostEditorView: View {
             }
         }
         .sheet(isPresented: $showingPublisherSettings) {
-            PublisherSettingsView()
+            AppSettingsView()
         }
         .alert("Couldn’t Publish", isPresented: $showingPublishError) {
             Button("OK", role: .cancel) {}
@@ -113,7 +116,7 @@ struct PostEditorView: View {
 
         do {
             let permalink = try await MicropubClient().publish(
-                title: post.title,
+                title: showPostTitles ? post.title : "",
                 content: post.body,
                 endpoint: publisherConfiguration.endpoint,
                 token: publisherConfiguration.token()

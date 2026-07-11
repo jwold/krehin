@@ -92,7 +92,7 @@ struct ContentView: View {
             selectFirstVisiblePostIfNeeded()
         }
         .sheet(isPresented: $showingPublisherSettings) {
-            PublisherSettingsView()
+            AppSettingsView()
         }
     }
 

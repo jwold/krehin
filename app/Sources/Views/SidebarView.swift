@@ -28,7 +28,7 @@ struct SidebarView: View {
         }
         .navigationTitle("Krehin")
         .safeAreaInset(edge: .bottom) {
-            Button("Publishing Settings", systemImage: "gearshape", action: showPublisherSettings)
+            Button("Settings", systemImage: "gearshape", action: showPublisherSettings)
                 .buttonStyle(.plain)
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)

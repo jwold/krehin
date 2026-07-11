@@ -31,11 +31,16 @@ struct PostListView: View {
 
 private struct PostRowView: View {
     let post: PostRecord
+    @AppStorage("show-post-titles") private var showPostTitles = false
+
+    private var rowTitle: String {
+        post.displayTitle(showPostTitles: showPostTitles)
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack(alignment: .firstTextBaseline, spacing: 5) {
-                Text(post.displayTitle)
+                Text(rowTitle)
                     .font(.headline)
                     .lineLimit(2)
                 if !post.externalURL.isEmpty {
@@ -45,7 +50,7 @@ private struct PostRowView: View {
                 }
             }
 
-            if !post.excerpt.isEmpty && post.excerpt != post.displayTitle {
+            if !post.excerpt.isEmpty && post.excerpt != rowTitle {
                 Text(post.excerpt)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
