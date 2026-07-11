@@ -81,6 +81,7 @@ struct ContentView: View {
             if let selectedPost {
                 PostEditorView(post: selectedPost, requestDelete: { requestDelete(selectedPost) })
                     .id(selectedPost.persistentModelID)
+                    .navigationSplitViewColumnWidth(min: 320, ideal: 520)
             } else {
                 ContentUnavailableView {
                     Label("Select a Post", systemImage: "doc.text")

@@ -13,6 +13,9 @@ struct KrehinApp: App {
         WindowGroup {
             ContentView()
                 .environment(publisher)
+                #if os(macOS)
+                .frame(minWidth: 780, minHeight: 500)
+                #endif
         }
         .modelContainer(container)
         #if os(macOS)
