@@ -41,6 +41,8 @@ describe("Krehin publisher", () => {
         expect(url).toContain("/repos/jwold/krehin/contents/src/posts/2026-07-10-a-useful-thought-");
         const payload = JSON.parse(String(init?.body));
         const markdown = Buffer.from(payload.content, "base64").toString("utf8");
+        expect(markdown).toContain("date: 2026-07-10T16:00:00.000Z");
+        expect(markdown).not.toContain('date: "2026-07-10T16:00:00.000Z"');
         expect(markdown).toContain('title: "A useful thought"');
         expect(markdown).toContain("> A quoted line\n\nAnd a response.");
     });

@@ -9,7 +9,7 @@ function localDay(date) {
         year: "numeric",
         month: "2-digit",
         day: "2-digit"
-    }).formatToParts(date);
+    }).formatToParts(new Date(date));
     const values = Object.fromEntries(parts.map(({type, value}) => [type, value]));
     return `${values.year}-${values.month}-${values.day}`;
 }
@@ -24,7 +24,7 @@ module.exports = function (eleventyConfig) {
         month: "short",
         day: "numeric",
         year: "numeric"
-    }).format(date));
+    }).format(new Date(date)));
 
     eleventyConfig.addFilter("isoDate", (date) => new Date(date).toISOString());
     eleventyConfig.addFilter("absoluteSiteUrl", (path, base) => {
@@ -39,7 +39,7 @@ module.exports = function (eleventyConfig) {
     eleventyConfig.addCollection("postDays", (collectionApi) => {
         const posts = collectionApi.getFilteredByTag("posts")
             .filter((post) => !post.data.draft)
-            .sort((a, b) => b.date - a.date);
+            .sort((a, b) => new Date(b.date) - new Date(a.date));
         const groups = [];
 
         for (const post of posts) {

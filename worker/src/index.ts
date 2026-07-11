@@ -190,7 +190,7 @@ function postSlug(post: PostInput): string {
 function markdownFor(post: PostInput, slug: string): string {
     const frontmatter = [
         "---",
-        `date: ${JSON.stringify(post.published)}`,
+        `date: ${post.published}`,
         `slug: ${JSON.stringify(slug)}`,
         ...(post.title ? [`title: ${JSON.stringify(post.title)}`] : []),
         ...(post.categories.length ? [`categories: ${JSON.stringify(post.categories)}`] : []),
