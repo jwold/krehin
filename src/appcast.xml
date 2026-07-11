@@ -14,7 +14,7 @@
             <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
             <description sparkle:format="markdown"><![CDATA[Initial Sparkle-enabled release.
 ]]></description>
-            <enclosure url="https://github.com/jwold/krehin/releases/download/v0.1.0/Krehin-0.1.0.zip" length="2947829" type="application/octet-stream" sparkle:edSignature="YgL1TX5HE6xdJQPigcI6ZGS0AEwGokvhTQb4u45mSvheH/4uap/xW6CS/GcNepwZffYWV4ODRCGsXEjSYzLHCQ=="/>
+            <enclosure url="https://github.com/jwold/krehin/releases/download/v0.1.0/Krehin-0.1.0.zip" length="2947839" type="application/octet-stream" sparkle:edSignature="G3eGkqjSsZIIL58YKUfm2+0Iop4f9qXrpeCEnZ7pwgabEqpvjX4jbridhyQVUe9bFfgFfILkD9V/x22ck6UhBg=="/>
         </item>
     </channel>
 </rss>
