@@ -1,9 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
-  <channel>
-    <title>Krehin Updates</title>
-    <link>https://krehin.com/</link>
-    <description>Updates for the Krehin macOS app.</description>
-    <language>en</language>
-  </channel>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Krehin Updates</title>
+        <link>https://krehin.com/</link>
+        <description>Updates for the Krehin macOS app.</description>
+        <language>en</language>
+        <item>
+            <title>0.1.0</title>
+            <pubDate>Fri, 10 Jul 2026 20:23:06 -0700</pubDate>
+            <link>https://krehin.com/</link>
+            <sparkle:version>1</sparkle:version>
+            <sparkle:shortVersionString>0.1.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description sparkle:format="markdown"><![CDATA[Initial Sparkle-enabled release.
+]]></description>
+            <enclosure url="https://github.com/jwold/krehin/releases/download/v0.1.0/Krehin-0.1.0.zip" length="2947829" type="application/octet-stream" sparkle:edSignature="YgL1TX5HE6xdJQPigcI6ZGS0AEwGokvhTQb4u45mSvheH/4uap/xW6CS/GcNepwZffYWV4ODRCGsXEjSYzLHCQ=="/>
+        </item>
+    </channel>
 </rss>
