@@ -18,8 +18,11 @@ description: Short notes by Joshua Wold.
             </h2>
         </header>
         {% endif %}
-        {% if post.content %}<div class="post-content">{{ post.content | safe }}</div>{% endif %}
-        {% if not post.data.title %}<a class="note-permalink" href="{{ post.url }}" aria-label="Permalink">★</a>{% endif %}
+        {% if not post.data.title %}
+        <div class="post-content note-content">{{ post.content | safe }}<a class="note-permalink" href="{{ post.url }}" aria-label="Permalink">★</a></div>
+        {% elif post.content %}
+        <div class="post-content">{{ post.content | safe }}</div>
+        {% endif %}
     </article>
     {% endfor %}
 {% else %}

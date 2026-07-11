@@ -167,10 +167,11 @@ textarea {
 
 .note-permalink {
     display: inline-block;
-    margin-top: 0.5rem;
+    margin-left: 0.35em;
     color: var(--muted);
     font-size: 0.75rem;
     text-decoration: none;
+    vertical-align: 0.08em;
 }
 
 .note-permalink:hover {
@@ -195,6 +196,10 @@ textarea {
 
 .post-content > :last-child {
     margin-bottom: 0;
+}
+
+.note-content > p:nth-last-child(2) {
+    display: inline;
 }
 
 .post-content p,
