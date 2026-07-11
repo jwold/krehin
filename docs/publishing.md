@@ -30,7 +30,7 @@ publish adds the `published` tag to the draft.
 ## iA Writer
 
 1. Open **Settings/Preferences -> Accounts -> Add Account -> Micropub**.
-2. Enter `https://jwold.github.io/krehin/` as the website.
+2. Enter `https://krehin.com/` as the website.
 3. Choose manual access-token entry when offered and paste the Micropub token.
 4. In the account options, choose Markdown as the post format.
 5. Use **Publish -> New Draft on Krehin** from the document or Library menu.

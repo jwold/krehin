@@ -56,7 +56,7 @@ module.exports = function (eleventyConfig) {
     });
 
     return {
-        pathPrefix: process.env.PATH_PREFIX || "/krehin/",
+        pathPrefix: process.env.PATH_PREFIX || "/",
         dir: {
             input: "src",
             output: "_site",

@@ -30,8 +30,8 @@ jobs:
       - name: Build site
         run: npm run build
         env:
-          PATH_PREFIX: /krehin/
-          SITE_URL: https://jwold.github.io/krehin
+          PATH_PREFIX: /
+          SITE_URL: https://krehin.com
           MICROPUB_ENDPOINT: https://krehin-publisher.joshua-wold.workers.dev/micropub
       - name: Configure Pages
         uses: actions/configure-pages@v5

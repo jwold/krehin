@@ -6,7 +6,7 @@ const env = {
     GITHUB_REPO: "krehin",
     GITHUB_BRANCH: "main",
     POSTS_DIRECTORY: "src/posts",
-    SITE_URL: "https://jwold.github.io/krehin",
+    SITE_URL: "https://krehin.com",
     GITHUB_TOKEN: "github-secret",
     MICROPUB_TOKEN: "micropub-secret"
 } as Env;
@@ -35,7 +35,7 @@ describe("Krehin publisher", () => {
 
         const response = await handleRequest(request, env, fetcher as typeof fetch);
         expect(response.status).toBe(201);
-        expect(response.headers.get("location")).toMatch(/^https:\/\/jwold\.github\.io\/krehin\/2026-07-10-a-useful-thought-[a-f0-9]{8}\/$/);
+        expect(response.headers.get("location")).toMatch(/^https:\/\/krehin\.com\/2026-07-10-a-useful-thought-[a-f0-9]{8}\/$/);
 
         const [url, init] = fetcher.mock.calls[0];
         expect(url).toContain("/repos/jwold/krehin/contents/src/posts/2026-07-10-a-useful-thought-");
@@ -112,7 +112,7 @@ describe("Krehin publisher", () => {
             },
             body: new URLSearchParams({
                 action: "delete",
-                url: "https://jwold.github.io/krehin/existing-note/"
+                url: "https://krehin.com/existing-note/"
             })
         });
 

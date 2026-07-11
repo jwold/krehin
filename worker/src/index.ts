@@ -281,18 +281,22 @@ async function commitPost(post: PostInput, slug: string, env: Env, fetcher: Fetc
 
 function slugFromPermalink(value: string, env: Env): string {
     let permalink: URL;
-    let site: URL;
+    let sites: URL[];
     try {
         permalink = new URL(value);
-        site = new URL(env.SITE_URL);
+        sites = [new URL(env.SITE_URL), new URL("https://jwold.github.io/krehin")];
     } catch {
         throw new RequestError(400, "invalid_request", "The post permalink is invalid.");
     }
 
-    const basePath = `${site.pathname.replace(/\/$/, "")}/`;
-    if (permalink.origin !== site.origin || !permalink.pathname.startsWith(basePath)) {
+    const site = sites.find((candidate) => {
+        const basePath = `${candidate.pathname.replace(/\/$/, "")}/`;
+        return permalink.origin === candidate.origin && permalink.pathname.startsWith(basePath);
+    });
+    if (!site) {
         throw new RequestError(400, "invalid_request", "Only Krehin post permalinks can be changed.");
     }
+    const basePath = `${site.pathname.replace(/\/$/, "")}/`;
     const remainder = decodeURIComponent(permalink.pathname.slice(basePath.length)).replace(/\/$/, "");
     if (!/^[a-z0-9-]+$/.test(remainder)) {
         throw new RequestError(400, "invalid_request", "The post permalink is invalid.");
