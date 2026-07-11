@@ -18,6 +18,7 @@ module.exports = function (eleventyConfig) {
     eleventyConfig.addPlugin(EleventyHtmlBasePlugin);
     eleventyConfig.addPlugin(pluginRss);
     eleventyConfig.addPassthroughCopy({"src/assets": "assets"});
+    eleventyConfig.addPassthroughCopy("src/appcast.xml");
 
     eleventyConfig.addFilter("readableDate", (date) => new Intl.DateTimeFormat("en-US", {
         timeZone: TIME_ZONE,
