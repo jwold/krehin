@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		06ECEC0E5D53AF4DA723CA80 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 876CE87122B3F4DAB2F17D9E /* KeychainStore.swift */; };
+		0DFF789B4D690B96C9695B0B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8646F331FB38B348C7DE46C6 /* Assets.xcassets */; };
 		13329D24C51E8FDAFDAEDE37 /* KrehinApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85382A5F89B84FF3F0B3D5BB /* KrehinApp.swift */; };
 		2845AAEC51F703C73B7AE32D /* PostRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40F5363D761EE4B96EEA7AD3 /* PostRecord.swift */; };
 		2D78A119E7CC5DE29131865F /* PublisherSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F012A4FEB6C92C36A4BF22A /* PublisherSettingsView.swift */; };
@@ -18,6 +19,7 @@
 		4820D3C9B829EC61392F950A /* MicropubClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23139B30977FE09EE54445C4 /* MicropubClient.swift */; };
 		4AC3CE9D3D4328650B719B65 /* PostListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76D1A73591A459EFB5A6EB77 /* PostListView.swift */; };
 		51382A988297DFC772582349 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE8215E34914921C23958280 /* SidebarView.swift */; };
+		64E88B81637256218E203C9C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8646F331FB38B348C7DE46C6 /* Assets.xcassets */; };
 		72E3B5DC957CBBD24BA1D4FB /* PublisherConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = D159CFF28F5316A516040459 /* PublisherConfiguration.swift */; };
 		89DB0FD38E026BB2D765C7BA /* PublisherSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F012A4FEB6C92C36A4BF22A /* PublisherSettingsView.swift */; };
 		984B8B2ADCBF52CDB09E5DDD /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE8215E34914921C23958280 /* SidebarView.swift */; };
@@ -36,6 +38,7 @@
 		6F012A4FEB6C92C36A4BF22A /* PublisherSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublisherSettingsView.swift; sourceTree = "<group>"; };
 		76D1A73591A459EFB5A6EB77 /* PostListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostListView.swift; sourceTree = "<group>"; };
 		85382A5F89B84FF3F0B3D5BB /* KrehinApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KrehinApp.swift; sourceTree = "<group>"; };
+		8646F331FB38B348C7DE46C6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		876CE87122B3F4DAB2F17D9E /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
 		A9309D5D847BE5E02A2EA51A /* Krehin.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Krehin.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C94EAAFC1B101EDA7E5915C1 /* PostEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostEditorView.swift; sourceTree = "<group>"; };
@@ -48,6 +51,7 @@
 		01DDBFCF88EA67C128B09259 = {
 			isa = PBXGroup;
 			children = (
+				6605ECAF6D4E519CBB01E6B1 /* Resources */,
 				402FA71E96B3B2DB7FF23752 /* Sources */,
 				C669BA4880B82B70315551D8 /* Products */,
 			);
@@ -72,6 +76,14 @@
 				D159CFF28F5316A516040459 /* PublisherConfiguration.swift */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		6605ECAF6D4E519CBB01E6B1 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				8646F331FB38B348C7DE46C6 /* Assets.xcassets */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		B927AC2F5900102A15644D4E /* Views */ = {
@@ -111,6 +123,7 @@
 			buildConfigurationList = 4E0F0CDA9B8376BF81B7B3B6 /* Build configuration list for PBXNativeTarget "Krehin" */;
 			buildPhases = (
 				49A9B80AB8C586FE95D97EF3 /* Sources */,
+				058A88DAA53A258871B575BF /* Resources */,
 			);
 			buildRules = (
 			);
@@ -128,6 +141,7 @@
 			buildConfigurationList = 8C1F590CA6F4C345C238C5E2 /* Build configuration list for PBXNativeTarget "Krehin-iOS" */;
 			buildPhases = (
 				33B028F3BF62AD34D693AB9D /* Sources */,
+				BDD8B94C8D239809B5425FB7 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -176,6 +190,25 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		058A88DAA53A258871B575BF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				64E88B81637256218E203C9C /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BDD8B94C8D239809B5425FB7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0DFF789B4D690B96C9695B0B /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		33B028F3BF62AD34D693AB9D /* Sources */ = {

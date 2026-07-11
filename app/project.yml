@@ -17,6 +17,8 @@ targets:
     platform: macOS
     sources:
       - Sources
+      - path: Resources
+        buildPhase: resources
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.joshuawold.krehin
@@ -30,6 +32,8 @@ targets:
     platform: iOS
     sources:
       - Sources
+      - path: Resources
+        buildPhase: resources
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.joshuawold.krehin.ios
