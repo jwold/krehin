@@ -7,11 +7,22 @@ struct PostListView: View {
     @Binding var selection: PersistentIdentifier?
     @Binding var searchText: String
     let createPost: () -> Void
+    let requestDelete: (PostRecord) -> Void
 
     var body: some View {
         List(posts, selection: $selection) { post in
             PostRowView(post: post)
                 .tag(post.persistentModelID)
+                .contextMenu {
+                    Button("Delete", systemImage: "trash", role: .destructive) {
+                        requestDelete(post)
+                    }
+                }
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    Button("Delete", systemImage: "trash", role: .destructive) {
+                        requestDelete(post)
+                    }
+                }
         }
         .overlay {
             if posts.isEmpty {

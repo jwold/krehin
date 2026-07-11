@@ -34,6 +34,52 @@ struct MicropubClient: Sendable {
         return permalink
     }
 
+    func update(title: String, content: String, permalink: String, endpoint: String, token: String) async throws {
+        try await mutate(
+            fields: [
+                URLQueryItem(name: "action", value: "update"),
+                URLQueryItem(name: "url", value: permalink),
+                URLQueryItem(name: "replace[name]", value: title),
+                URLQueryItem(name: "replace[content]", value: content)
+            ],
+            endpoint: endpoint,
+            token: token
+        )
+    }
+
+    func delete(permalink: String, endpoint: String, token: String) async throws {
+        try await mutate(
+            fields: [
+                URLQueryItem(name: "action", value: "delete"),
+                URLQueryItem(name: "url", value: permalink)
+            ],
+            endpoint: endpoint,
+            token: token
+        )
+    }
+
+    private func mutate(fields: [URLQueryItem], endpoint: String, token: String) async throws {
+        guard let endpointURL = URL(string: endpoint), endpointURL.scheme == "https" else {
+            throw MicropubError.invalidEndpoint
+        }
+        var request = URLRequest(url: endpointURL)
+        request.httpMethod = "POST"
+        request.timeoutInterval = 30
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        var form = URLComponents()
+        form.queryItems = fields
+        request.httpBody = form.percentEncodedQuery?.data(using: .utf8)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw MicropubError.invalidResponse
+        }
+        guard httpResponse.statusCode == 204 else {
+            throw MicropubError.rejected(status: httpResponse.statusCode, message: Self.errorMessage(from: data))
+        }
+    }
+
     private static func errorMessage(from data: Data) -> String? {
         guard let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             return String(data: data, encoding: .utf8)

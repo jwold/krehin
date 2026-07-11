@@ -27,12 +27,18 @@ enum PostFilter: String, CaseIterable, Identifiable {
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(PublisherConfiguration.self) private var publisherConfiguration
     @Query(sort: \PostRecord.modifiedAt, order: .reverse) private var posts: [PostRecord]
 
     @State private var filter: PostFilter? = .all
     @State private var selection: PersistentIdentifier?
     @State private var searchText = ""
     @State private var showingPublisherSettings = false
+    @State private var deleteCandidate: PostRecord?
+    @State private var showingDeleteConfirmation = false
+    @State private var showingDeleteError = false
+    @State private var deleteError = ""
+    @AppStorage("show-post-titles") private var showPostTitles = false
 
     private var visiblePosts: [PostRecord] {
         posts.filter { post in
@@ -67,12 +73,13 @@ struct ContentView: View {
                 posts: visiblePosts,
                 selection: $selection,
                 searchText: $searchText,
-                createPost: createPost
+                createPost: createPost,
+                requestDelete: requestDelete
             )
             .navigationSplitViewColumnWidth(min: 280, ideal: 330, max: 420)
         } detail: {
             if let selectedPost {
-                PostEditorView(post: selectedPost)
+                PostEditorView(post: selectedPost, requestDelete: { requestDelete(selectedPost) })
                     .id(selectedPost.persistentModelID)
             } else {
                 ContentUnavailableView {
@@ -86,6 +93,7 @@ struct ContentView: View {
         }
         .task {
             seedPostsIfNeeded()
+            backfillPublishedBaselines()
             selectFirstVisiblePostIfNeeded()
         }
         .onChange(of: filter) {
@@ -93,6 +101,23 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showingPublisherSettings) {
             AppSettingsView()
+        }
+        .confirmationDialog("Delete Post?", isPresented: $showingDeleteConfirmation, presenting: deleteCandidate) { post in
+            Button("Delete", role: .destructive) {
+                Task { await delete(post) }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: { post in
+            if post.status == .published && !post.remoteURL.isEmpty {
+                Text("This removes the post from the app and website.")
+            } else {
+                Text("This removes the post from this app.")
+            }
+        }
+        .alert("Couldn’t Delete", isPresented: $showingDeleteError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(deleteError)
         }
     }
 
@@ -102,6 +127,36 @@ struct ContentView: View {
         try? modelContext.save()
         filter = .drafts
         selection = post.persistentModelID
+    }
+
+    private func requestDelete(_ post: PostRecord) {
+        deleteCandidate = post
+        showingDeleteConfirmation = true
+    }
+
+    @MainActor
+    private func delete(_ post: PostRecord) async {
+        do {
+            if post.status == .published && !post.remoteURL.isEmpty {
+                guard publisherConfiguration.hasToken else {
+                    showingPublisherSettings = true
+                    return
+                }
+                try await MicropubClient().delete(
+                    permalink: post.remoteURL,
+                    endpoint: publisherConfiguration.endpoint,
+                    token: publisherConfiguration.token()
+                )
+            }
+            if selection == post.persistentModelID { selection = nil }
+            modelContext.delete(post)
+            try modelContext.save()
+            deleteCandidate = nil
+            selectFirstVisiblePostIfNeeded()
+        } catch {
+            deleteError = error.localizedDescription
+            showingDeleteError = true
+        }
     }
 
     private func selectFirstVisiblePostIfNeeded() {
@@ -150,6 +205,21 @@ struct ContentView: View {
         ]
 
         examples.forEach(modelContext.insert)
+        try? modelContext.save()
+    }
+
+    private func backfillPublishedBaselines() {
+        let published = posts.filter {
+            $0.status == .published
+                && !$0.remoteURL.isEmpty
+                && $0.lastPublishedTitle.isEmpty
+                && $0.lastPublishedBody.isEmpty
+        }
+        guard !published.isEmpty else { return }
+        for post in published {
+            post.lastPublishedTitle = showPostTitles ? post.title : ""
+            post.lastPublishedBody = post.body
+        }
         try? modelContext.save()
     }
 }

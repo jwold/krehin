@@ -5,12 +5,19 @@ struct PostEditorView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(PublisherConfiguration.self) private var publisherConfiguration
     @Bindable var post: PostRecord
+    let requestDelete: () -> Void
     @FocusState private var focusedField: Field?
     @State private var isPublishing = false
     @State private var showingPublisherSettings = false
     @State private var showingPublishError = false
     @State private var publishError = ""
     @AppStorage("show-post-titles") private var showPostTitles = false
+
+    private var effectiveTitle: String { showPostTitles ? post.title : "" }
+
+    private var hasUnpublishedChanges: Bool {
+        effectiveTitle != post.lastPublishedTitle || post.body != post.lastPublishedBody
+    }
 
     private enum Field {
         case title
@@ -58,6 +65,18 @@ struct PostEditorView: View {
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 if post.status == .published {
+                    if !post.remoteURL.isEmpty && hasUnpublishedChanges {
+                        Button(action: startUpdating) {
+                            if isPublishing {
+                                ProgressView()
+                                    .controlSize(.small)
+                            } else {
+                                Label("Update", systemImage: "arrow.triangle.2.circlepath")
+                            }
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(isPublishing || (post.body.isEmpty && (!showPostTitles || post.title.isEmpty)))
+                    }
                     if let permalink = URL(string: post.remoteURL), !post.remoteURL.isEmpty {
                         ShareLink(item: permalink) {
                             Label("Share", systemImage: "square.and.arrow.up")
@@ -79,6 +98,8 @@ struct PostEditorView: View {
                         .keyboardShortcut(.return, modifiers: .command)
                         .disabled(isPublishing || (post.body.isEmpty && (!showPostTitles || post.title.isEmpty)))
                 }
+                Button("Delete", systemImage: "trash", role: .destructive, action: requestDelete)
+                    .disabled(isPublishing)
             }
         }
         .onAppear {
@@ -109,6 +130,14 @@ struct PostEditorView: View {
         Task { await publish() }
     }
 
+    private func startUpdating() {
+        guard publisherConfiguration.hasToken else {
+            showingPublisherSettings = true
+            return
+        }
+        Task { await update() }
+    }
+
     @MainActor
     private func publish() async {
         isPublishing = true
@@ -125,6 +154,31 @@ struct PostEditorView: View {
             post.publishedAt = .now
             post.modifiedAt = .now
             post.remoteURL = permalink.absoluteString
+            post.lastPublishedTitle = effectiveTitle
+            post.lastPublishedBody = post.body
+            try modelContext.save()
+        } catch {
+            publishError = error.localizedDescription
+            showingPublishError = true
+        }
+    }
+
+    @MainActor
+    private func update() async {
+        isPublishing = true
+        defer { isPublishing = false }
+
+        do {
+            try await MicropubClient().update(
+                title: effectiveTitle,
+                content: post.body,
+                permalink: post.remoteURL,
+                endpoint: publisherConfiguration.endpoint,
+                token: publisherConfiguration.token()
+            )
+            post.lastPublishedTitle = effectiveTitle
+            post.lastPublishedBody = post.body
+            post.modifiedAt = .now
             try modelContext.save()
         } catch {
             publishError = error.localizedDescription

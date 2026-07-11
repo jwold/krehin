@@ -19,6 +19,12 @@ interface MicropubJson {
     properties?: Record<string, unknown>;
 }
 
+interface GitHubFile {
+    sha: string;
+    content: string;
+    encoding: string;
+}
+
 class RequestError extends Error {
     constructor(public status: number, public code: string, message: string) {
         super(message);
@@ -146,9 +152,7 @@ function fromJson(body: string): PostInput {
     };
 }
 
-async function parsePost(request: Request): Promise<PostInput> {
-    const contentType = (request.headers.get("content-type") || "").split(";", 1)[0].toLowerCase();
-    const body = await readLimitedBody(request);
+function parsePost(contentType: string, body: string): PostInput {
     let post: PostInput;
 
     if (contentType === "application/json") {
@@ -200,22 +204,67 @@ function markdownFor(post: PostInput, slug: string): string {
     return `${frontmatter.join("\n")}\n${post.content ? `\n${post.content}\n` : ""}`;
 }
 
-async function commitPost(post: PostInput, slug: string, env: Env, fetcher: Fetcher): Promise<void> {
+function markdownForUpdate(existing: string, post: PostInput, slug: string): string {
+    const match = existing.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n)?/);
+    if (!match) {
+        throw new RequestError(502, "invalid_source", "The existing post has invalid front matter.");
+    }
+
+    const existingLines = match[1].split(/\r?\n/);
+    const dateLine = existingLines.find((line) => /^date\s*:/.test(line)) || `date: ${post.published}`;
+    const preservedLines = existingLines.filter((line) => !/^(date|slug|title)\s*:/.test(line));
+    const frontmatter = [
+        "---",
+        dateLine,
+        `slug: ${JSON.stringify(slug)}`,
+        ...(post.title ? [`title: ${JSON.stringify(post.title)}`] : []),
+        ...preservedLines,
+        "---"
+    ];
+    return `${frontmatter.join("\n")}\n${post.content ? `\n${post.content}\n` : ""}`;
+}
+
+function githubEndpoint(slug: string, env: Env): string {
     const path = `${env.POSTS_DIRECTORY}/${slug}.md`;
-    const endpoint = `https://api.github.com/repos/${encodeURIComponent(env.GITHUB_OWNER)}/${encodeURIComponent(env.GITHUB_REPO)}/contents/${path.split("/").map(encodeURIComponent).join("/")}`;
-    const response = await fetcher(endpoint, {
+    return `https://api.github.com/repos/${encodeURIComponent(env.GITHUB_OWNER)}/${encodeURIComponent(env.GITHUB_REPO)}/contents/${path.split("/").map(encodeURIComponent).join("/")}`;
+}
+
+function githubHeaders(env: Env): Record<string, string> {
+    return {
+        accept: "application/vnd.github+json",
+        authorization: `Bearer ${env.GITHUB_TOKEN}`,
+        "content-type": "application/json",
+        "user-agent": "krehin-publisher",
+        "x-github-api-version": GITHUB_API_VERSION
+    };
+}
+
+async function githubFile(slug: string, env: Env, fetcher: Fetcher): Promise<GitHubFile> {
+    const response = await fetcher(`${githubEndpoint(slug, env)}?ref=${encodeURIComponent(env.GITHUB_BRANCH)}`, {
+        headers: githubHeaders(env)
+    });
+    if (!response.ok) {
+        const detail = (await response.text()).slice(0, 500);
+        console.error(JSON.stringify({event: "github_read_failed", status: response.status, detail}));
+        if (response.status === 404) throw new RequestError(404, "not_found", "The published post was not found.");
+        throw new RequestError(502, "temporarily_unavailable", "GitHub could not read the post.");
+    }
+    const file = await response.json<GitHubFile>();
+    if (file.encoding !== "base64" || !file.sha || !file.content) {
+        throw new RequestError(502, "invalid_source", "GitHub returned an invalid post file.");
+    }
+    return file;
+}
+
+async function putPost(markdown: string, slug: string, message: string, env: Env, fetcher: Fetcher, sha?: string): Promise<void> {
+    const response = await fetcher(githubEndpoint(slug, env), {
         method: "PUT",
-        headers: {
-            accept: "application/vnd.github+json",
-            authorization: `Bearer ${env.GITHUB_TOKEN}`,
-            "content-type": "application/json",
-            "user-agent": "krehin-publisher",
-            "x-github-api-version": GITHUB_API_VERSION
-        },
+        headers: githubHeaders(env),
         body: JSON.stringify({
-            message: `Publish ${slug}`,
+            message,
             branch: env.GITHUB_BRANCH,
-            content: Buffer.from(markdownFor(post, slug), "utf8").toString("base64")
+            content: Buffer.from(markdown, "utf8").toString("base64"),
+            ...(sha ? {sha} : {})
         })
     });
 
@@ -224,6 +273,70 @@ async function commitPost(post: PostInput, slug: string, env: Env, fetcher: Fetc
         console.error(JSON.stringify({event: "github_commit_failed", status: response.status, detail}));
         throw new RequestError(502, "temporarily_unavailable", "GitHub did not accept the post.");
     }
+}
+
+async function commitPost(post: PostInput, slug: string, env: Env, fetcher: Fetcher): Promise<void> {
+    await putPost(markdownFor(post, slug), slug, `Publish ${slug}`, env, fetcher);
+}
+
+function slugFromPermalink(value: string, env: Env): string {
+    let permalink: URL;
+    let site: URL;
+    try {
+        permalink = new URL(value);
+        site = new URL(env.SITE_URL);
+    } catch {
+        throw new RequestError(400, "invalid_request", "The post permalink is invalid.");
+    }
+
+    const basePath = `${site.pathname.replace(/\/$/, "")}/`;
+    if (permalink.origin !== site.origin || !permalink.pathname.startsWith(basePath)) {
+        throw new RequestError(400, "invalid_request", "Only Krehin post permalinks can be changed.");
+    }
+    const remainder = decodeURIComponent(permalink.pathname.slice(basePath.length)).replace(/\/$/, "");
+    if (!/^[a-z0-9-]+$/.test(remainder)) {
+        throw new RequestError(400, "invalid_request", "The post permalink is invalid.");
+    }
+    return remainder;
+}
+
+function updateInput(form: URLSearchParams): PostInput {
+    const content = (form.get("replace[content]") || form.get("content") || "").trim();
+    const title = (form.get("replace[name]") || form.get("name") || "").trim();
+    if (!title && !content) throw new RequestError(400, "invalid_request", "A title or content is required.");
+    return {
+        title,
+        content,
+        categories: [],
+        published: new Date().toISOString(),
+        requestedSlug: "",
+        externalUrl: ""
+    };
+}
+
+async function updatePost(form: URLSearchParams, env: Env, fetcher: Fetcher): Promise<string> {
+    const slug = slugFromPermalink(form.get("url") || "", env);
+    const file = await githubFile(slug, env, fetcher);
+    const existing = Buffer.from(file.content.replace(/\s/g, ""), "base64").toString("utf8");
+    const post = updateInput(form);
+    await putPost(markdownForUpdate(existing, post, slug), slug, `Update ${slug}`, env, fetcher, file.sha);
+    return slug;
+}
+
+async function deletePost(form: URLSearchParams, env: Env, fetcher: Fetcher): Promise<string> {
+    const slug = slugFromPermalink(form.get("url") || "", env);
+    const file = await githubFile(slug, env, fetcher);
+    const response = await fetcher(githubEndpoint(slug, env), {
+        method: "DELETE",
+        headers: githubHeaders(env),
+        body: JSON.stringify({message: `Delete ${slug}`, branch: env.GITHUB_BRANCH, sha: file.sha})
+    });
+    if (!response.ok) {
+        const detail = (await response.text()).slice(0, 500);
+        console.error(JSON.stringify({event: "github_delete_failed", status: response.status, detail}));
+        throw new RequestError(502, "temporarily_unavailable", "GitHub did not delete the post.");
+    }
+    return slug;
 }
 
 export async function handleRequest(request: Request, env: Env, fetcher: Fetcher = fetch): Promise<Response> {
@@ -249,7 +362,24 @@ export async function handleRequest(request: Request, env: Env, fetcher: Fetcher
     }
 
     try {
-        const post = await parsePost(request);
+        const contentType = (request.headers.get("content-type") || "").split(";", 1)[0].toLowerCase();
+        const body = await readLimitedBody(request);
+        if (contentType === "application/x-www-form-urlencoded") {
+            const form = new URLSearchParams(body);
+            const action = form.get("action");
+            if (action === "update") {
+                const slug = await updatePost(form, env, fetcher);
+                console.log(JSON.stringify({event: "post_updated", slug}));
+                return new Response(null, {status: 204, headers: {"cache-control": "no-store"}});
+            }
+            if (action === "delete") {
+                const slug = await deletePost(form, env, fetcher);
+                console.log(JSON.stringify({event: "post_deleted", slug}));
+                return new Response(null, {status: 204, headers: {"cache-control": "no-store"}});
+            }
+        }
+
+        const post = parsePost(contentType, body);
         const slug = postSlug(post);
         await commitPost(post, slug, env, fetcher);
         const location = `${env.SITE_URL.replace(/\/$/, "")}/${slug}/`;
@@ -268,4 +398,4 @@ export default {
     }
 } satisfies ExportedHandler<Env>;
 
-export const testing = {fromForm, fromJson, markdownFor, slugify};
+export const testing = {fromForm, fromJson, markdownFor, markdownForUpdate, slugify, slugFromPermalink};

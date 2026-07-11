@@ -56,6 +56,76 @@ describe("Krehin publisher", () => {
         expect(post.categories).toEqual(["notes", "web"]);
     });
 
+    it("updates the Markdown behind an existing permalink", async () => {
+        const existing = [
+            "---",
+            "date: 2026-07-10T16:00:00.000Z",
+            'slug: "existing-note"',
+            'categories: ["notes"]',
+            "---",
+            "",
+            "Old body",
+            ""
+        ].join("\n");
+        const fetcher = vi.fn<typeof fetch>()
+            .mockResolvedValueOnce(Response.json({
+                sha: "existing-sha",
+                encoding: "base64",
+                content: Buffer.from(existing).toString("base64")
+            }))
+            .mockResolvedValueOnce(Response.json({content: {sha: "updated-sha"}}, {status: 200}));
+        const request = new Request("https://publisher.example/micropub", {
+            method: "POST",
+            headers: {
+                authorization: "Bearer micropub-secret",
+                "content-type": "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams({
+                action: "update",
+                url: "https://jwold.github.io/krehin/existing-note/",
+                "replace[name]": "Updated title",
+                "replace[content]": "Updated body"
+            })
+        });
+
+        const response = await handleRequest(request, env, fetcher);
+        expect(response.status).toBe(204);
+        expect(fetcher).toHaveBeenCalledTimes(2);
+        const updatePayload = JSON.parse(String(fetcher.mock.calls[1][1]?.body));
+        const markdown = Buffer.from(updatePayload.content, "base64").toString("utf8");
+        expect(updatePayload.sha).toBe("existing-sha");
+        expect(markdown).toContain("date: 2026-07-10T16:00:00.000Z");
+        expect(markdown).toContain('categories: ["notes"]');
+        expect(markdown).toContain('title: "Updated title"');
+        expect(markdown).toContain("Updated body");
+    });
+
+    it("deletes the Markdown behind an existing permalink", async () => {
+        const fetcher = vi.fn<typeof fetch>()
+            .mockResolvedValueOnce(Response.json({sha: "existing-sha", encoding: "base64", content: "YQ=="}))
+            .mockResolvedValueOnce(new Response(null, {status: 200}));
+        const request = new Request("https://publisher.example/micropub", {
+            method: "POST",
+            headers: {
+                authorization: "Bearer micropub-secret",
+                "content-type": "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams({
+                action: "delete",
+                url: "https://jwold.github.io/krehin/existing-note/"
+            })
+        });
+
+        const response = await handleRequest(request, env, fetcher);
+        expect(response.status).toBe(204);
+        expect(fetcher.mock.calls[1][1]?.method).toBe("DELETE");
+        expect(JSON.parse(String(fetcher.mock.calls[1][1]?.body)).sha).toBe("existing-sha");
+    });
+
+    it("rejects mutations outside the Krehin site", () => {
+        expect(() => testing.slugFromPermalink("https://example.com/post/", env)).toThrow("Only Krehin");
+    });
+
     it("rejects oversized posts before committing", async () => {
         const request = new Request("https://publisher.example/micropub", {
             method: "POST",

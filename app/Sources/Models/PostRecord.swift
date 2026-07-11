@@ -16,6 +16,8 @@ final class PostRecord {
     var publishedAt: Date?
     var externalURL: String
     var remoteURL: String = ""
+    var lastPublishedTitle: String = ""
+    var lastPublishedBody: String = ""
 
     init(
         title: String = "",
@@ -25,7 +27,9 @@ final class PostRecord {
         modifiedAt: Date = .now,
         publishedAt: Date? = nil,
         externalURL: String = "",
-        remoteURL: String = ""
+        remoteURL: String = "",
+        lastPublishedTitle: String = "",
+        lastPublishedBody: String = ""
     ) {
         self.title = title
         self.body = body
@@ -35,6 +39,8 @@ final class PostRecord {
         self.publishedAt = publishedAt
         self.externalURL = externalURL
         self.remoteURL = remoteURL
+        self.lastPublishedTitle = lastPublishedTitle
+        self.lastPublishedBody = lastPublishedBody
     }
 
     var status: PostStatus {
