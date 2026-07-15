@@ -6,6 +6,17 @@
         <description>Updates for the Krehin macOS app.</description>
         <language>en</language>
         <item>
+            <title>0.1.6</title>
+            <pubDate>Wed, 15 Jul 2026 11:35:31 -0700</pubDate>
+            <link>https://krehin.com/</link>
+            <sparkle:version>6</sparkle:version>
+            <sparkle:shortVersionString>0.1.6</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description sparkle:format="markdown"><![CDATA[- The post list is now a single sidebar you can reliably show or hide with the toolbar toggle (or View menu), collapsing to a clean editor. All/Drafts/Published moved into a segmented control at the top of the list.
+]]></description>
+            <enclosure url="https://github.com/jwold/krehin/releases/download/v0.1.6/Krehin-0.1.6.zip" length="1398828" type="application/octet-stream" sparkle:edSignature="3tT0nXM/9YiZDUih4lqHsiCiGqgVohzjypySdaCya4YKTVAMx/UYsGlq0R4TPUsWWv8EaTyxtxwjobfRlTpJCw=="/>
+        </item>
+        <item>
             <title>0.1.5</title>
             <pubDate>Wed, 15 Jul 2026 11:10:21 -0700</pubDate>
             <link>https://krehin.com/</link>
@@ -29,17 +40,6 @@
 - A simpler, refreshed app icon.
 ]]></description>
             <enclosure url="https://github.com/jwold/krehin/releases/download/v0.1.4/Krehin-0.1.4.zip" length="1408356" type="application/octet-stream" sparkle:edSignature="NeEH4oN8gJN7bJKUUPMsJul11Q/KaZirl6ivYaAGJdznxdg/9Grp5yA7N4IWpCmuxHTI4JasyzgpoYfziE6bBA=="/>
-        </item>
-        <item>
-            <title>0.1.2</title>
-            <pubDate>Fri, 10 Jul 2026 21:07:29 -0700</pubDate>
-            <link>https://krehin.com/</link>
-            <sparkle:version>3</sparkle:version>
-            <sparkle:shortVersionString>0.1.2</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-            <description sparkle:format="markdown"><![CDATA[Adopts native macOS interface conventions, including a standard Settings window, system-styled controls, Mac-appropriate deletion, and a cleaner editor and sidebar.
-]]></description>
-            <enclosure url="https://github.com/jwold/krehin/releases/download/v0.1.2/Krehin-0.1.2.zip" length="2925581" type="application/octet-stream" sparkle:edSignature="O1sbmvYrQa/NXhTrECzyyGwncIbcm1+PftO57+X0pfY64LNmzSGV7whFQJ9FPdLnTYFTrTdGXQ9nJSzn+k9RBA=="/>
         </item>
     </channel>
 </rss>
