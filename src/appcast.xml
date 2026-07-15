@@ -6,6 +6,17 @@
         <description>Updates for the Krehin macOS app.</description>
         <language>en</language>
         <item>
+            <title>0.1.7</title>
+            <pubDate>Wed, 15 Jul 2026 11:51:31 -0700</pubDate>
+            <link>https://krehin.com/</link>
+            <sparkle:version>7</sparkle:version>
+            <sparkle:shortVersionString>0.1.7</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description sparkle:format="markdown"><![CDATA[- The app window can now be resized narrower (minimum width lowered to 600pt) for a more compact writing window.
+]]></description>
+            <enclosure url="https://github.com/jwold/krehin/releases/download/v0.1.7/Krehin-0.1.7.zip" length="1398830" type="application/octet-stream" sparkle:edSignature="46Woq6D2JyHNKRE7owXcsOzL/g6z4C+nSvi8calkn48IOiY+qh+TnPgmGhOs2CvZsDB3vmGTAp7wrdjQFeeCAA=="/>
+        </item>
+        <item>
             <title>0.1.6</title>
             <pubDate>Wed, 15 Jul 2026 11:35:31 -0700</pubDate>
             <link>https://krehin.com/</link>
@@ -26,20 +37,6 @@
             <description sparkle:format="markdown"><![CDATA[- Fixed the sidebar toolbar: two clear controls instead of three. The system button shows or hides the filter sidebar, and the new button collapses the post list down to just the editor.
 ]]></description>
             <enclosure url="https://github.com/jwold/krehin/releases/download/v0.1.5/Krehin-0.1.5.zip" length="1405970" type="application/octet-stream" sparkle:edSignature="U5A3TuYzVpttGQ3O2hDIbzhzk2emo8ebBVKKtYTPg0eM3Fj+x2oTjG6D+F8Nd+eCmttsWwaXBe3vFp+CWiBZDw=="/>
-        </item>
-        <item>
-            <title>0.1.4</title>
-            <pubDate>Wed, 15 Jul 2026 10:41:28 -0700</pubDate>
-            <link>https://krehin.com/</link>
-            <sparkle:version>4</sparkle:version>
-            <sparkle:shortVersionString>0.1.4</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-            <description sparkle:format="markdown"><![CDATA[- Krehin now opens straight into a new draft, so you can start writing right away.
-- The filter sidebar and post list tuck away for a clean, focused editor, and toggle back from the toolbar.
-- The editor blends into the window instead of sitting on a hard black panel.
-- A simpler, refreshed app icon.
-]]></description>
-            <enclosure url="https://github.com/jwold/krehin/releases/download/v0.1.4/Krehin-0.1.4.zip" length="1408356" type="application/octet-stream" sparkle:edSignature="NeEH4oN8gJN7bJKUUPMsJul11Q/KaZirl6ivYaAGJdznxdg/9Grp5yA7N4IWpCmuxHTI4JasyzgpoYfziE6bBA=="/>
         </item>
     </channel>
 </rss>
