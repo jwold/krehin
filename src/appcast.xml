@@ -6,6 +6,17 @@
         <description>Updates for the Krehin macOS app.</description>
         <language>en</language>
         <item>
+            <title>0.1.5</title>
+            <pubDate>Wed, 15 Jul 2026 11:10:21 -0700</pubDate>
+            <link>https://krehin.com/</link>
+            <sparkle:version>5</sparkle:version>
+            <sparkle:shortVersionString>0.1.5</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description sparkle:format="markdown"><![CDATA[- Fixed the sidebar toolbar: two clear controls instead of three. The system button shows or hides the filter sidebar, and the new button collapses the post list down to just the editor.
+]]></description>
+            <enclosure url="https://github.com/jwold/krehin/releases/download/v0.1.5/Krehin-0.1.5.zip" length="1405970" type="application/octet-stream" sparkle:edSignature="U5A3TuYzVpttGQ3O2hDIbzhzk2emo8ebBVKKtYTPg0eM3Fj+x2oTjG6D+F8Nd+eCmttsWwaXBe3vFp+CWiBZDw=="/>
+        </item>
+        <item>
             <title>0.1.4</title>
             <pubDate>Wed, 15 Jul 2026 10:41:28 -0700</pubDate>
             <link>https://krehin.com/</link>
@@ -29,17 +40,6 @@
             <description sparkle:format="markdown"><![CDATA[Adopts native macOS interface conventions, including a standard Settings window, system-styled controls, Mac-appropriate deletion, and a cleaner editor and sidebar.
 ]]></description>
             <enclosure url="https://github.com/jwold/krehin/releases/download/v0.1.2/Krehin-0.1.2.zip" length="2925581" type="application/octet-stream" sparkle:edSignature="O1sbmvYrQa/NXhTrECzyyGwncIbcm1+PftO57+X0pfY64LNmzSGV7whFQJ9FPdLnTYFTrTdGXQ9nJSzn+k9RBA=="/>
-        </item>
-        <item>
-            <title>0.1.1</title>
-            <pubDate>Fri, 10 Jul 2026 20:26:14 -0700</pubDate>
-            <link>https://krehin.com/</link>
-            <sparkle:version>2</sparkle:version>
-            <sparkle:shortVersionString>0.1.1</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-            <description sparkle:format="markdown"><![CDATA[Validates automatic updates from the new private app repository.
-]]></description>
-            <enclosure url="https://github.com/jwold/krehin/releases/download/v0.1.1/Krehin-0.1.1.zip" length="2947850" type="application/octet-stream" sparkle:edSignature="uGreYvXz7OVKJXwSjNL1c5E0hMgwpGQY1SXuJXD+uwkwNKbMp8DbFfIhaLsQudtZFKIte+h22kne7TzmA/owAw=="/>
         </item>
     </channel>
 </rss>
