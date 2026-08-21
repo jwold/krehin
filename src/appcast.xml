@@ -6,6 +6,17 @@
         <description>Updates for the Krehin macOS app.</description>
         <language>en</language>
         <item>
+            <title>0.1.11</title>
+            <pubDate>Fri, 21 Aug 2026 15:53:41 -0700</pubDate>
+            <link>https://krehin.com/</link>
+            <sparkle:version>11</sparkle:version>
+            <sparkle:shortVersionString>0.1.11</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description sparkle:format="markdown"><![CDATA[Bigger editor text by default. Settings shows the app version. Faster typing, Markdown export, and safer sync with status.
+]]></description>
+            <enclosure url="https://github.com/jwold/krehin/releases/download/v0.1.11/Krehin-0.1.11.zip" length="1545094" type="application/octet-stream" sparkle:edSignature="v7hH5UcF0cnUtBMbopIezux3Vdn0wCmerm88PHpJUGtX8ST2/Cfebk67BfphBFK3SxU5LayyARw/gsEsRePPBQ=="/>
+        </item>
+        <item>
             <title>0.1.10</title>
             <pubDate>Fri, 21 Aug 2026 15:10:53 -0700</pubDate>
             <link>https://krehin.com/</link>
@@ -26,17 +37,6 @@
             <description sparkle:format="markdown"><![CDATA[Cmd+K wraps selected text in a Markdown link, prefilled from the clipboard. Bold and italic shortcuts too, all listed in a new Format menu in the editor toolbar.
 ]]></description>
             <enclosure url="https://github.com/jwold/krehin/releases/download/v0.1.9/Krehin-0.1.9.zip" length="1422882" type="application/octet-stream" sparkle:edSignature="s1vAjtEfLq70V/B4bu1fsD3fVFNtr3ULBrZ4QSM/Tz/ubZr3/aUAOzK+eHLQliO7x7J5gUjvxuOlXwi6ydl4Cw=="/>
-        </item>
-        <item>
-            <title>0.1.7</title>
-            <pubDate>Wed, 15 Jul 2026 11:51:31 -0700</pubDate>
-            <link>https://krehin.com/</link>
-            <sparkle:version>7</sparkle:version>
-            <sparkle:shortVersionString>0.1.7</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-            <description sparkle:format="markdown"><![CDATA[- The app window can now be resized narrower (minimum width lowered to 600pt) for a more compact writing window.
-]]></description>
-            <enclosure url="https://github.com/jwold/krehin/releases/download/v0.1.7/Krehin-0.1.7.zip" length="1398830" type="application/octet-stream" sparkle:edSignature="46Woq6D2JyHNKRE7owXcsOzL/g6z4C+nSvi8calkn48IOiY+qh+TnPgmGhOs2CvZsDB3vmGTAp7wrdjQFeeCAA=="/>
         </item>
     </channel>
 </rss>
