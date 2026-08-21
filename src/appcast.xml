@@ -6,6 +6,17 @@
         <description>Updates for the Krehin macOS app.</description>
         <language>en</language>
         <item>
+            <title>0.1.9</title>
+            <pubDate>Fri, 21 Aug 2026 14:37:20 -0700</pubDate>
+            <link>https://krehin.com/</link>
+            <sparkle:version>9</sparkle:version>
+            <sparkle:shortVersionString>0.1.9</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description sparkle:format="markdown"><![CDATA[Cmd+K wraps selected text in a Markdown link, prefilled from the clipboard. Bold and italic shortcuts too, all listed in a new Format menu in the editor toolbar.
+]]></description>
+            <enclosure url="https://github.com/jwold/krehin/releases/download/v0.1.9/Krehin-0.1.9.zip" length="1422882" type="application/octet-stream" sparkle:edSignature="s1vAjtEfLq70V/B4bu1fsD3fVFNtr3ULBrZ4QSM/Tz/ubZr3/aUAOzK+eHLQliO7x7J5gUjvxuOlXwi6ydl4Cw=="/>
+        </item>
+        <item>
             <title>0.1.7</title>
             <pubDate>Wed, 15 Jul 2026 11:51:31 -0700</pubDate>
             <link>https://krehin.com/</link>
@@ -26,17 +37,6 @@
             <description sparkle:format="markdown"><![CDATA[- The post list is now a single sidebar you can reliably show or hide with the toolbar toggle (or View menu), collapsing to a clean editor. All/Drafts/Published moved into a segmented control at the top of the list.
 ]]></description>
             <enclosure url="https://github.com/jwold/krehin/releases/download/v0.1.6/Krehin-0.1.6.zip" length="1398828" type="application/octet-stream" sparkle:edSignature="3tT0nXM/9YiZDUih4lqHsiCiGqgVohzjypySdaCya4YKTVAMx/UYsGlq0R4TPUsWWv8EaTyxtxwjobfRlTpJCw=="/>
-        </item>
-        <item>
-            <title>0.1.5</title>
-            <pubDate>Wed, 15 Jul 2026 11:10:21 -0700</pubDate>
-            <link>https://krehin.com/</link>
-            <sparkle:version>5</sparkle:version>
-            <sparkle:shortVersionString>0.1.5</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-            <description sparkle:format="markdown"><![CDATA[- Fixed the sidebar toolbar: two clear controls instead of three. The system button shows or hides the filter sidebar, and the new button collapses the post list down to just the editor.
-]]></description>
-            <enclosure url="https://github.com/jwold/krehin/releases/download/v0.1.5/Krehin-0.1.5.zip" length="1405970" type="application/octet-stream" sparkle:edSignature="U5A3TuYzVpttGQ3O2hDIbzhzk2emo8ebBVKKtYTPg0eM3Fj+x2oTjG6D+F8Nd+eCmttsWwaXBe3vFp+CWiBZDw=="/>
         </item>
     </channel>
 </rss>
