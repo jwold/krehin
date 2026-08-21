@@ -6,7 +6,11 @@ const MAX_DRAFTS = 1000;
 // Tombstones stay long enough for a device that has been offline for a while
 // to learn about the deletion, then expire so the store does not grow forever.
 const TOMBSTONE_LIFETIME_MS = 90 * 24 * 60 * 60 * 1000;
-const DRAFT_KEY_PREFIX = "draft:";
+// Every draft lives in one value. A key per draft cost one KV read per draft
+// on every sync, which is both slow and bounded by the per-request subrequest
+// limit once the archive grows.
+const DRAFTS_KEY = "drafts:v1";
+const LEGACY_DRAFT_KEY_PREFIX = "draft:";
 const GITHUB_API_VERSION = "2026-03-10";
 
 type Fetcher = typeof fetch;
@@ -448,22 +452,36 @@ function isExpiredTombstone(record: DraftRecord, now: number): boolean {
     return now - new Date(record.deletedAt).valueOf() > TOMBSTONE_LIFETIME_MS;
 }
 
-async function readStoredDrafts(env: Env): Promise<Map<string, DraftRecord>> {
-    const stored = new Map<string, DraftRecord>();
-    let cursor: string | undefined;
+async function readStoredDrafts(env: Env): Promise<{records: Map<string, DraftRecord>; legacyKeys: string[]}> {
+    const records = new Map<string, DraftRecord>();
 
+    const combined = await env.DRAFTS.get(DRAFTS_KEY, "json") as Record<string, DraftRecord> | null;
+    if (combined) {
+        for (const record of Object.values(combined)) {
+            if (record && typeof record.id === "string") records.set(record.id, record);
+        }
+    }
+
+    // Drafts written before the single-value layout are folded in once and
+    // their keys removed after the merged value is stored.
+    const legacyKeys: string[] = [];
+    let cursor: string | undefined;
     do {
-        const page = await env.DRAFTS.list({prefix: DRAFT_KEY_PREFIX, cursor});
+        const page = await env.DRAFTS.list({prefix: LEGACY_DRAFT_KEY_PREFIX, cursor});
         const values = await Promise.all(page.keys.map((key) => env.DRAFTS.get(key.name, "json")));
-        for (const value of values) {
+        for (const [index, value] of values.entries()) {
+            legacyKeys.push(page.keys[index].name);
             if (!value) continue;
             const record = value as DraftRecord;
-            if (typeof record.id === "string") stored.set(record.id, record);
+            if (typeof record.id !== "string") continue;
+            const existing = records.get(record.id);
+            if (existing && new Date(existing.modifiedAt).valueOf() >= new Date(record.modifiedAt).valueOf()) continue;
+            records.set(record.id, record);
         }
         cursor = page.list_complete ? undefined : page.cursor;
     } while (cursor);
 
-    return stored;
+    return {records, legacyKeys};
 }
 
 /// Last write wins per record, compared on the client's modified timestamp.
@@ -485,8 +503,8 @@ async function syncDrafts(request: Request, env: Env): Promise<Response> {
     }
 
     const now = Date.now();
-    const merged = await readStoredDrafts(env);
-    const writes: Promise<unknown>[] = [];
+    const {records: merged, legacyKeys} = await readStoredDrafts(env);
+    let changed = legacyKeys.length > 0;
 
     for (const record of incoming) {
         const existing = merged.get(record.id);
@@ -494,16 +512,19 @@ async function syncDrafts(request: Request, env: Env): Promise<Response> {
             continue;
         }
         merged.set(record.id, record);
-        writes.push(env.DRAFTS.put(`${DRAFT_KEY_PREFIX}${record.id}`, JSON.stringify(record)));
+        changed = true;
     }
 
     for (const [id, record] of merged) {
         if (!isExpiredTombstone(record, now)) continue;
         merged.delete(id);
-        writes.push(env.DRAFTS.delete(`${DRAFT_KEY_PREFIX}${id}`));
+        changed = true;
     }
 
-    await Promise.all(writes);
+    if (changed) {
+        await env.DRAFTS.put(DRAFTS_KEY, JSON.stringify(Object.fromEntries(merged)));
+        await Promise.all(legacyKeys.map((key) => env.DRAFTS.delete(key)));
+    }
     console.log(JSON.stringify({event: "drafts_synced", received: incoming.length, stored: merged.size}));
     return json({records: Array.from(merged.values())});
 }

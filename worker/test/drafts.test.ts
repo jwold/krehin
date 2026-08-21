@@ -64,6 +64,34 @@ function syncRequest(records: unknown[]) {
 }
 
 describe("draft sync", () => {
+    it("reads every draft from a single key instead of one read per draft", async () => {
+        const kv = memoryKV({
+            "drafts:v1": {
+                "11111111-2222-3333-4444-555555555555": draft(),
+                "22222222-3333-4444-5555-666666666666": draft({id: "22222222-3333-4444-5555-666666666666", body: "Second"})
+            }
+        });
+        const reads: string[] = [];
+        const counted = {...kv, get: async (key: string) => { reads.push(key); return kv.get(key); }};
+
+        const response = await handleRequest(syncRequest([]), envWith(counted as ReturnType<typeof memoryKV>));
+
+        const payload = await response.json() as {records: unknown[]};
+        expect(payload.records).toHaveLength(2);
+        expect(reads).toEqual(["drafts:v1"]);
+    });
+
+    it("folds drafts stored under the old per-draft keys into the combined value", async () => {
+        const kv = memoryKV({"draft:11111111-2222-3333-4444-555555555555": draft({body: "Written before the migration"})});
+
+        const response = await handleRequest(syncRequest([]), envWith(kv));
+
+        const payload = await response.json() as {records: {body: string}[]};
+        expect(payload.records[0].body).toBe("Written before the migration");
+        expect(kv.store.has("draft:11111111-2222-3333-4444-555555555555")).toBe(false);
+        expect(Object.keys(JSON.parse(kv.store.get("drafts:v1") || "{}"))).toHaveLength(1);
+    });
+
     it("rejects unauthorized sync requests", async () => {
         const response = await handleRequest(new Request("https://publisher.example/drafts", {method: "POST"}), envWith(memoryKV()));
         expect(response.status).toBe(401);
@@ -76,7 +104,7 @@ describe("draft sync", () => {
         const payload = await response.json() as {records: {id: string; body: string}[]};
         expect(payload.records).toHaveLength(1);
         expect(payload.records[0].body).toBe("A draft from the phone");
-        expect(kv.store.size).toBe(1);
+        expect(Object.keys(JSON.parse(kv.store.get("drafts:v1") || "{}"))).toHaveLength(1);
     });
 
     it("keeps the newer edit when both sides changed", async () => {
@@ -119,7 +147,8 @@ describe("draft sync", () => {
         const response = await handleRequest(syncRequest([]), envWith(kv));
         const payload = await response.json() as {records: unknown[]};
         expect(payload.records).toHaveLength(0);
-        expect(kv.store.size).toBe(0);
+        expect(kv.store.has("draft:11111111-2222-3333-4444-555555555555")).toBe(false);
+        expect(JSON.parse(kv.store.get("drafts:v1") || "{}")).toEqual({});
     });
 
     it("rejects identifiers that would escape the draft key space", async () => {
