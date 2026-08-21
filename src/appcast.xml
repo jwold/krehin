@@ -6,6 +6,17 @@
         <description>Updates for the Krehin macOS app.</description>
         <language>en</language>
         <item>
+            <title>0.1.10</title>
+            <pubDate>Fri, 21 Aug 2026 15:10:53 -0700</pubDate>
+            <link>https://krehin.com/</link>
+            <sparkle:version>10</sparkle:version>
+            <sparkle:shortVersionString>0.1.10</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description sparkle:format="markdown"><![CDATA[Posts now sync between the Mac and iPhone apps. Adjustable editor text size, and Cmd+K wraps selected text in a Markdown link.
+]]></description>
+            <enclosure url="https://github.com/jwold/krehin/releases/download/v0.1.10/Krehin-0.1.10.zip" length="1489105" type="application/octet-stream" sparkle:edSignature="+tc7FDCHmP52US9FCu+v8VQVO/K2SlkntDUiMfKioZSH9if8DdmXx3ML/R5TxlziaWyvJ2JNSOZcpuSVZpTqCA=="/>
+        </item>
+        <item>
             <title>0.1.9</title>
             <pubDate>Fri, 21 Aug 2026 14:37:20 -0700</pubDate>
             <link>https://krehin.com/</link>
@@ -26,17 +37,6 @@
             <description sparkle:format="markdown"><![CDATA[- The app window can now be resized narrower (minimum width lowered to 600pt) for a more compact writing window.
 ]]></description>
             <enclosure url="https://github.com/jwold/krehin/releases/download/v0.1.7/Krehin-0.1.7.zip" length="1398830" type="application/octet-stream" sparkle:edSignature="46Woq6D2JyHNKRE7owXcsOzL/g6z4C+nSvi8calkn48IOiY+qh+TnPgmGhOs2CvZsDB3vmGTAp7wrdjQFeeCAA=="/>
-        </item>
-        <item>
-            <title>0.1.6</title>
-            <pubDate>Wed, 15 Jul 2026 11:35:31 -0700</pubDate>
-            <link>https://krehin.com/</link>
-            <sparkle:version>6</sparkle:version>
-            <sparkle:shortVersionString>0.1.6</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-            <description sparkle:format="markdown"><![CDATA[- The post list is now a single sidebar you can reliably show or hide with the toolbar toggle (or View menu), collapsing to a clean editor. All/Drafts/Published moved into a segmented control at the top of the list.
-]]></description>
-            <enclosure url="https://github.com/jwold/krehin/releases/download/v0.1.6/Krehin-0.1.6.zip" length="1398828" type="application/octet-stream" sparkle:edSignature="3tT0nXM/9YiZDUih4lqHsiCiGqgVohzjypySdaCya4YKTVAMx/UYsGlq0R4TPUsWWv8EaTyxtxwjobfRlTpJCw=="/>
         </item>
     </channel>
 </rss>
