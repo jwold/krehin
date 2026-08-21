@@ -1,6 +1,12 @@
 import {createHash, timingSafeEqual} from "node:crypto";
 
 const MAX_BODY_BYTES = 128 * 1024;
+const MAX_SYNC_BODY_BYTES = 2 * 1024 * 1024;
+const MAX_DRAFTS = 1000;
+// Tombstones stay long enough for a device that has been offline for a while
+// to learn about the deletion, then expire so the store does not grow forever.
+const TOMBSTONE_LIFETIME_MS = 90 * 24 * 60 * 60 * 1000;
+const DRAFT_KEY_PREFIX = "draft:";
 const GITHUB_API_VERSION = "2026-03-10";
 
 type Fetcher = typeof fetch;
@@ -23,6 +29,20 @@ interface GitHubFile {
     sha: string;
     content: string;
     encoding: string;
+}
+
+interface DraftRecord {
+    id: string;
+    title: string;
+    body: string;
+    status: string;
+    createdAt: string;
+    modifiedAt: string;
+    publishedAt: string | null;
+    remoteUrl: string;
+    lastPublishedTitle: string;
+    lastPublishedBody: string;
+    deletedAt: string | null;
 }
 
 class RequestError extends Error {
@@ -51,9 +71,9 @@ function isAuthorized(request: Request, expectedToken: string): boolean {
     return timingSafeEqual(expectedHash, providedHash);
 }
 
-async function readLimitedBody(request: Request): Promise<string> {
+async function readLimitedBody(request: Request, maxBytes = MAX_BODY_BYTES): Promise<string> {
     const declaredLength = Number(request.headers.get("content-length") || 0);
-    if (declaredLength > MAX_BODY_BYTES) {
+    if (declaredLength > maxBytes) {
         throw new RequestError(413, "request_too_large", "Posts must be smaller than 128 KB.");
     }
     if (!request.body) return "";
@@ -66,7 +86,7 @@ async function readLimitedBody(request: Request): Promise<string> {
         const {done, value} = await reader.read();
         if (done) break;
         total += value.byteLength;
-        if (total > MAX_BODY_BYTES) {
+        if (total > maxBytes) {
             await reader.cancel();
             throw new RequestError(413, "request_too_large", "Posts must be smaller than 128 KB.");
         }
@@ -365,11 +385,152 @@ async function deletePost(form: URLSearchParams, env: Env, fetcher: Fetcher): Pr
     return slug;
 }
 
+
+function requiredString(source: Record<string, unknown>, key: string): string {
+    const value = source[key];
+    if (typeof value !== "string") {
+        throw new RequestError(400, "invalid_request", `Draft field ${key} must be a string.`);
+    }
+    return value;
+}
+
+function optionalTimestamp(source: Record<string, unknown>, key: string): string | null {
+    const value = source[key];
+    if (value === null || value === undefined || value === "") return null;
+    if (typeof value !== "string") {
+        throw new RequestError(400, "invalid_request", `Draft field ${key} must be a date string.`);
+    }
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.valueOf())) {
+        throw new RequestError(400, "invalid_request", `Draft field ${key} is not a valid date.`);
+    }
+    return parsed.toISOString();
+}
+
+function requiredTimestamp(source: Record<string, unknown>, key: string): string {
+    const value = optionalTimestamp(source, key);
+    if (!value) throw new RequestError(400, "invalid_request", `Draft field ${key} is required.`);
+    return value;
+}
+
+function parseDraft(value: unknown): DraftRecord {
+    if (!value || typeof value !== "object" || Array.isArray(value)) {
+        throw new RequestError(400, "invalid_request", "Each draft must be an object.");
+    }
+    const source = value as Record<string, unknown>;
+    const id = requiredString(source, "id").trim();
+    // Client identifiers are UUIDs. Anything else would let a caller reach
+    // outside the draft key space.
+    if (!/^[a-z0-9-]{8,64}$/.test(id)) {
+        throw new RequestError(400, "invalid_request", "Draft identifiers must be lowercase UUIDs.");
+    }
+    const status = requiredString(source, "status");
+    if (status !== "draft" && status !== "published") {
+        throw new RequestError(400, "invalid_request", "Draft status must be draft or published.");
+    }
+    return {
+        id,
+        title: requiredString(source, "title"),
+        body: requiredString(source, "body"),
+        status,
+        createdAt: requiredTimestamp(source, "createdAt"),
+        modifiedAt: requiredTimestamp(source, "modifiedAt"),
+        publishedAt: optionalTimestamp(source, "publishedAt"),
+        remoteUrl: requiredString(source, "remoteUrl"),
+        lastPublishedTitle: requiredString(source, "lastPublishedTitle"),
+        lastPublishedBody: requiredString(source, "lastPublishedBody"),
+        deletedAt: optionalTimestamp(source, "deletedAt")
+    };
+}
+
+function isExpiredTombstone(record: DraftRecord, now: number): boolean {
+    if (!record.deletedAt) return false;
+    return now - new Date(record.deletedAt).valueOf() > TOMBSTONE_LIFETIME_MS;
+}
+
+async function readStoredDrafts(env: Env): Promise<Map<string, DraftRecord>> {
+    const stored = new Map<string, DraftRecord>();
+    let cursor: string | undefined;
+
+    do {
+        const page = await env.DRAFTS.list({prefix: DRAFT_KEY_PREFIX, cursor});
+        const values = await Promise.all(page.keys.map((key) => env.DRAFTS.get(key.name, "json")));
+        for (const value of values) {
+            if (!value) continue;
+            const record = value as DraftRecord;
+            if (typeof record.id === "string") stored.set(record.id, record);
+        }
+        cursor = page.list_complete ? undefined : page.cursor;
+    } while (cursor);
+
+    return stored;
+}
+
+/// Last write wins per record, compared on the client's modified timestamp.
+async function syncDrafts(request: Request, env: Env): Promise<Response> {
+    const body = await readLimitedBody(request, MAX_SYNC_BODY_BYTES);
+    let parsed: unknown;
+    try {
+        parsed = JSON.parse(body || "{}");
+    } catch {
+        throw new RequestError(400, "invalid_request", "The JSON body could not be parsed.");
+    }
+    const incomingRaw = (parsed as {records?: unknown}).records;
+    if (incomingRaw !== undefined && !Array.isArray(incomingRaw)) {
+        throw new RequestError(400, "invalid_request", "The records field must be an array.");
+    }
+    const incoming = (incomingRaw || []).map(parseDraft);
+    if (incoming.length > MAX_DRAFTS) {
+        throw new RequestError(413, "request_too_large", `Sync at most ${MAX_DRAFTS} drafts at a time.`);
+    }
+
+    const now = Date.now();
+    const merged = await readStoredDrafts(env);
+    const writes: Promise<unknown>[] = [];
+
+    for (const record of incoming) {
+        const existing = merged.get(record.id);
+        if (existing && new Date(existing.modifiedAt).valueOf() >= new Date(record.modifiedAt).valueOf()) {
+            continue;
+        }
+        merged.set(record.id, record);
+        writes.push(env.DRAFTS.put(`${DRAFT_KEY_PREFIX}${record.id}`, JSON.stringify(record)));
+    }
+
+    for (const [id, record] of merged) {
+        if (!isExpiredTombstone(record, now)) continue;
+        merged.delete(id);
+        writes.push(env.DRAFTS.delete(`${DRAFT_KEY_PREFIX}${id}`));
+    }
+
+    await Promise.all(writes);
+    console.log(JSON.stringify({event: "drafts_synced", received: incoming.length, stored: merged.size}));
+    return json({records: Array.from(merged.values())});
+}
+
 export async function handleRequest(request: Request, env: Env, fetcher: Fetcher = fetch): Promise<Response> {
     const url = new URL(request.url);
 
     if (url.pathname === "/" && request.method === "GET") {
         return json({name: "Krehin publisher", status: "ok"});
+    }
+    if (url.pathname === "/drafts") {
+        if (request.method === "OPTIONS") {
+            return new Response(null, {status: 204, headers: {allow: "POST, OPTIONS"}});
+        }
+        if (!isAuthorized(request, env.MICROPUB_TOKEN)) {
+            return json({error: "unauthorized"}, 401, {"www-authenticate": "Bearer"});
+        }
+        if (request.method !== "POST") {
+            return json({error: "invalid_request", error_description: "Use POST to sync drafts."}, 405, {allow: "POST, OPTIONS"});
+        }
+        try {
+            return await syncDrafts(request, env);
+        } catch (error) {
+            if (error instanceof RequestError) return errorResponse(error);
+            console.error(JSON.stringify({event: "draft_sync_failed", error: error instanceof Error ? error.message : "Unknown error"}));
+            return json({error: "server_error", error_description: "The drafts could not be synced."}, 500);
+        }
     }
     if (url.pathname !== "/micropub") {
         return json({error: "not_found"}, 404);
@@ -424,4 +585,4 @@ export default {
     }
 } satisfies ExportedHandler<Env>;
 
-export const testing = {fromForm, fromJson, markdownFor, markdownForUpdate, slugify, slugFromPermalink};
+export const testing = {parseDraft, fromForm, fromJson, markdownFor, markdownForUpdate, slugify, slugFromPermalink};
