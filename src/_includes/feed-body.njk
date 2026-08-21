@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>{{ site.name }}</title>
+  <subtitle>{{ site.description }}</subtitle>
+  {# Every alias points at the canonical feed so a reader that finds one of
+     them still subscribes to a single document. #}
+  <link href="{{ '/feed.xml' | absoluteSiteUrl(site.url) }}" rel="self" />
+  <link href="{{ '/' | absoluteSiteUrl(site.url) }}" />
+  <id>{{ site.url }}/</id>
+  <updated>{{ collections.publishedPosts | latestDate }}</updated>
+{% for post in collections.publishedPosts | reverse %}
+  <entry>
+    <title>{{ post.data.title or "Note" }}</title>
+    <link href="{{ post.url | absoluteSiteUrl(site.url) }}" />
+    <id>{{ post.url | absoluteSiteUrl(site.url) }}</id>
+    <updated>{{ post.date | isoDate }}</updated>
+    <content type="html"><![CDATA[{{ post.content | htmlToAbsoluteUrls(post.url | absoluteSiteUrl(site.url)) | safe }}]]></content>
+  </entry>
+{% endfor %}
+</feed>
