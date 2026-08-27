@@ -1,12 +1,14 @@
 :root {
     color-scheme: dark;
-    --background: #111110;
-    --surface: #1a1a19;
-    --text: #e8e8e4;
-    --muted: #9d9d97;
-    --line: #30302e;
-    --focus: #7dd3fc;
-    --content-width: 640px;
+    --background: #151513;
+    --surface: #1d1d1a;
+    --text: #dedbd3;
+    --muted: #96928a;
+    --line: #373631;
+    --focus: #b8b3a8;
+    --serif: Iowan Old Style, Palatino Linotype, Book Antiqua, Palatino, Charter, Georgia, serif;
+    --sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --content-width: 43rem;
 }
 
 *,
@@ -26,12 +28,11 @@ body {
     margin: 0;
     background: var(--background);
     color: var(--text);
-    font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-    font-size: 1rem;
-    line-height: 1.62;
+    font-family: var(--serif);
+    font-size: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+    line-height: 1.68;
     letter-spacing: 0;
     text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
 }
 
 a {
@@ -67,27 +68,28 @@ textarea {
 }
 
 .site-shell {
-    width: min(100% - 2rem, var(--content-width));
+    width: min(calc(100% - 2.5rem), var(--content-width));
     margin-inline: auto;
 }
 
 .site-header {
-    position: sticky;
-    z-index: 5;
-    top: 0;
-    border: 0;
-    background: rgba(17, 17, 16, 0.94);
-    -webkit-backdrop-filter: blur(16px);
-    backdrop-filter: blur(16px);
+    position: static;
+    background: var(--background);
+}
+
+.site-header .site-shell {
+    border-bottom: 1px solid var(--line);
 }
 
 .site-name {
     display: inline-flex;
     align-items: center;
-    min-height: 3.75rem;
+    min-height: 0;
+    padding-block: 2rem;
     color: var(--text);
-    font-size: 1.0625rem;
-    font-weight: 700;
+    font-size: 1em;
+    font-weight: 600;
+    letter-spacing: -0.01em;
     text-decoration: none;
 }
 
@@ -98,21 +100,21 @@ textarea {
 }
 
 .post {
-    padding: 2.5rem 0 2.625rem;
+    padding: clamp(3.25rem, 9vw, 6rem) 0;
     border: 0 !important;
     outline: 0 !important;
     box-shadow: none !important;
 }
 
 .day-break {
-    width: 3rem;
-    margin: 4.5rem 0;
+    width: 100%;
+    margin: 0;
     border: 0;
-    border-top: 1px solid var(--muted);
+    border-top: 1px solid var(--line);
 }
 
 .post--single {
-    padding: 2.5rem 0 4rem;
+    padding: clamp(3.25rem, 9vw, 6rem) 0;
     border: 0;
 }
 
@@ -125,11 +127,11 @@ textarea {
     margin: 0;
     overflow-wrap: anywhere;
     color: var(--text);
-    font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-    font-size: 1.125rem;
-    font-weight: 650;
-    line-height: 1.45;
-    letter-spacing: 0;
+    font-family: var(--serif);
+    font-size: 1.35rem;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
 }
 
 .post-title a {
@@ -179,14 +181,16 @@ textarea {
 }
 
 .post--single .post-title {
-    font-size: 1.375rem;
-    line-height: 1.4;
+    font-size: clamp(2rem, 7vw, 3.25rem);
+    font-weight: 500;
+    line-height: 1.08;
+    letter-spacing: -0.025em;
 }
 
 .post-content {
-    margin-top: 0.75rem;
+    margin-top: 0.8rem;
     color: var(--text);
-    font-size: 1.0625rem;
+    font-size: 1em;
     overflow-wrap: anywhere;
 }
 
@@ -208,7 +212,7 @@ textarea {
 .post-content blockquote,
 .post-content pre,
 .post-content figure {
-    margin-block: 1rem;
+    margin-block: 1.35em;
 }
 
 .post-content a {
@@ -218,18 +222,19 @@ textarea {
 .post-content h2,
 .post-content h3,
 .post-content h4 {
-    margin: 1.35rem 0 0.5rem;
-    font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-    font-size: 1rem;
-    line-height: 1.45;
-    letter-spacing: 0;
+    margin: 2.25em 0 0.7em;
+    font-family: var(--serif);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
 }
 
 .post-content blockquote {
     margin-inline: 0;
     padding-left: 1rem;
-    border-left: 2px solid var(--muted);
-    color: #cececa;
+    border-left: 1px solid var(--line);
+    color: var(--muted);
+    font-style: italic;
 }
 
 .post-content blockquote p:last-child {
@@ -363,7 +368,10 @@ textarea {
     min-height: 1.75rem;
     margin-top: 0.875rem;
     color: var(--muted);
-    font-size: 0.8125rem;
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    line-height: 1.5;
+    letter-spacing: 0.025em;
 }
 
 .permalink {
@@ -571,23 +579,11 @@ textarea {
 
 @media (max-width: 560px) {
     .site-shell {
-        width: 100%;
-    }
-
-    .site-header .site-shell {
-        padding-inline: 1rem;
-    }
-
-    .post {
-        padding: 2rem 1rem 2.125rem;
-    }
-
-    .post--single {
-        padding: 2rem 1rem 3rem;
+        width: min(calc(100% - 2rem), var(--content-width));
     }
 
     .day-break {
-        margin: 3.75rem 1rem;
+        margin: 0;
     }
 
     .pagination {
